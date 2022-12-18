@@ -37,6 +37,16 @@
               >Fetch data</a
             >
           </li>
+          <li *ngIf="!(isAuthenticated | async)" class="nav-item" [routerLinkActive]="['link-active']">
+            <a class="nav-link text-dark" [routerLink]="['/login']"
+              >Sign in</a
+            >
+          </li>
+          <li *ngIf="(isAuthenticated | async)" class="nav-item" [routerLinkActive]="['link-active']">
+            <a class="nav-link text-dark" [routerLink]="['/me']"
+              >{{ userName | async }}</a
+            >
+          </li>
         </ul>
       </div>
     </div>
