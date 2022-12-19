@@ -6,7 +6,7 @@ namespace Reviews.Models;
 public class Tag : BaseModel
 {
     [Required]
-    public string Name { get; set; }
+    public string Name { get; set; } = default!;
 
-    public virtual ICollection<Review> Reviews { get; set; }
+    public virtual ICollection<Review> Reviews { get; set; } = default!;
 }

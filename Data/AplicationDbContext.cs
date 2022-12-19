@@ -14,14 +14,14 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     {
     }
 
-    public DbSet<Review> Reviews { get; set; }
-    public DbSet<Commentary> Commentaries { get; set; }
-    public DbSet<Group> Groups { get; set; }
-    public DbSet<Image> Images { get; set; }
-    public DbSet<Like> Likes { get; set; }
-    public DbSet<Piece> Pieces { get; set; }
-    public DbSet<Raiting> Raitings { get; set; }
-    public DbSet<Tag> Tags { get; set; }
+    public DbSet<Review> Reviews { get; set; } = default!;
+    public DbSet<Commentary> Commentaries { get; set; } = default!;
+    public DbSet<Group> Groups { get; set; } = default!;
+    public DbSet<Image> Images { get; set; } = default!;
+    public DbSet<Like> Likes { get; set; } = default!;
+    public DbSet<Piece> Pieces { get; set; } = default!;
+    public DbSet<Raiting> Raitings { get; set; } = default!;
+    public DbSet<Tag> Tags { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
