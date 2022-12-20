@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    ports:
+      - "5000:80/tcp"
+    depends_on:
+      - postgres
+    networks:
+      - reviews
+
+  postgres:
+    image: postgres:latest
+    ports: 
+      - "5432"
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/postgres_data
+    environment:
+      - POSTGRES_USER=
+      - POSTGRES_PASSWORD=
+      - POSTGRES_DB=
+    networks:
+      - reviews
+    
+networks:
+  reviews:
+    driver: bridge
+
+volumes:
+  postgres_data:
