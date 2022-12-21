@@ -8,7 +8,7 @@
     <mat-icon *ngIf="theme === Theme.Light">light_mode</mat-icon>
     <mat-icon *ngIf="theme === Theme.Dark">dark_mode</mat-icon>
   </button>
-  <a *ngIf="!(isAuthenticated | async)" class="navbar-brand" [routerLink]="['/login']"
+  <a *ngIf="!(isAuthenticated | async)" class="navbar-brand" [routerLink]="['/login']" i18n
     >Sign in</a
   >
   <a *ngIf="(isAuthenticated | async)" class="navbar-brand" [routerLink]="['/me']"

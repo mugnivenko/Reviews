@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { LOCALE_ID, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { BrowserModule } from '@angular/platform-browser';
@@ -52,6 +52,7 @@ import { HttpClientInterceptor } from './http-client.interceptor';
       useClass: HttpClientInterceptor,
       multi: true,
     },
+    { provide: LOCALE_ID, useValue: 'en-US' },
   ],
   bootstrap: [AppComponent],
 })

@@ -1,9 +1,12 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, LOCALE_ID, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 
 import { SocialAuthService } from '@abacritt/angularx-social-login';
 import { MicrosoftLoginProvider } from '@abacritt/angularx-social-login';
+
+import { ThemeService } from 'src/app/theme/theme.service';
+import { Theme } from 'src/app/theme/shared/theme.enum';
 
 import { Subject, switchMap, takeUntil } from 'rxjs';
 import { LoginService } from './login.service';
@@ -16,13 +19,20 @@ import { LoginService } from './login.service';
 export class LoginComponent implements OnInit, OnDestroy {
   notifier = new Subject();
   isLoading: boolean = false;
+  theme?: string;
+  Theme = Theme;
+  localeId: string;
 
   constructor(
     private router: Router,
     private authService: SocialAuthService,
     private httpClient: HttpClient,
-    private service: LoginService
-  ) {}
+    private service: LoginService,
+    private themeService: ThemeService,
+    @Inject(LOCALE_ID) localeId: string
+  ) {
+    this.localeId = localeId;
+  }
 
   ngOnInit() {
     this.authService.authState
@@ -40,6 +50,12 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.service.saveJwtTokenPayload(response.token);
         this.isLoading = false;
         this.router.navigate(['/']);
+      });
+    this.themeService
+      .getTheme()
+      .pipe(takeUntil(this.notifier))
+      .subscribe((theme) => {
+        this.theme = theme;
       });
   }
 

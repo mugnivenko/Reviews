@@ -3,10 +3,23 @@
     <div class="d-flex flex-column w-50 gap-2 wrapper">
         <div *ngIf="isLoading; then loading else content"></div>
         <ng-template #content>
-            <asl-google-signin-button title='Sign in with Google' type='standard' size='medium'></asl-google-signin-button>
+            <asl-google-signin-button 
+                *ngIf="theme === Theme.Dark" 
+                theme="filled_black"
+                [locale]='localeId'
+                type='standard'
+                size='medium'>
+            </asl-google-signin-button>
+            <asl-google-signin-button 
+                *ngIf="theme === Theme.Light" 
+                theme="filled_blue"
+                [locale]='localeId'
+                type='standard'
+                size='medium'>
+            </asl-google-signin-button>
             <button mat-stroked-button class="microsoft-button" (click)="signInWithMicrosoft()">
                 <svg-icon src="../../../assets/svg/microsoft.svg"></svg-icon>
-                Sign in with Microsoft
+                <span i18n>Sign in with Microsoft</span>
             </button></ng-template>
         <ng-template #loading><mat-spinner></mat-spinner></ng-template>
     </div>
