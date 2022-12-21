@@ -1,37 +1,50 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { Observable, map } from 'rxjs';
+import { Observable, Subject, map, takeUntil } from 'rxjs';
 
+import { ThemeService } from '../theme/theme.service';
 import { AuthorizeService } from '../authorization/authorize.service';
+
+import { Theme } from '../theme/shared/theme.enum';
 
 @Component({
   selector: 'app-nav-menu',
   templateUrl: './nav-menu.component.html',
-  styleUrls: ['./nav-menu.component.css'],
+  styleUrls: ['./nav-menu.component.scss'],
 })
-export class NavMenuComponent implements OnInit {
+export class NavMenuComponent implements OnInit, OnDestroy {
   public isAuthenticated?: Observable<boolean>;
   public userName?: Observable<string | undefined>;
-  isExpanded = false;
+  public theme?: Theme;
+  public Theme = Theme;
+  private notifier = new Subject();
 
-  constructor(private authorizeService: AuthorizeService) {}
+  constructor(
+    private authorizeService: AuthorizeService,
+    private themeService: ThemeService
+  ) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.isAuthenticated = this.authorizeService.isAuthorized();
-    this.userName = this.authorizeService.getUser().pipe(
-      map((user) => {
-        console.log({ user });
+    this.userName = this.authorizeService
+      .getUser()
+      .pipe(map((user) => user?.userName));
+    this.themeService
+      .getTheme()
+      .pipe(takeUntil(this.notifier))
+      .subscribe((theme) => {
+        this.theme = theme;
+      });
+  }
 
-        return user?.userName;
-      })
+  toggleTheme() {
+    this.themeService.changeTheme(
+      this.theme === Theme.Dark ? Theme.Light : Theme.Dark
     );
   }
 
-  collapse() {
-    this.isExpanded = false;
-  }
-
-  toggle() {
-    this.isExpanded = !this.isExpanded;
+  ngOnDestroy() {
+    this.notifier.next(null);
+    this.notifier.complete();
   }
 }

@@ -5,6 +5,10 @@ import { BrowserModule } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 
 import { AppComponent } from './app.component';
@@ -14,7 +18,6 @@ import { CounterComponent } from './counter/counter.component';
 import { FetchDataComponent } from './fetch-data/fetch-data.component';
 import { AuthorizeInterceptor } from './authorization/authorize.interceptor';
 import { AuthorizationModule } from './authorization/authorization.module';
-
 import { HttpClientInterceptor } from './http-client.interceptor';
 
 @NgModule({
@@ -30,6 +33,10 @@ import { HttpClientInterceptor } from './http-client.interceptor';
     HttpClientModule,
     FormsModule,
     AuthorizationModule,
+    MatToolbarModule,
+    MatIconModule,
+    MatButtonModule,
+    MatSidenavModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'counter', component: CounterComponent },
