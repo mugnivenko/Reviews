@@ -1,0 +1,9 @@
+ClientApp/node_modules
+ClientApp/dist
+ClientApp/.angular
+.vscode
+.git
+**/Obj/
+**/obj/
+**/bin/
+**/Bin/
