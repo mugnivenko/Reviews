@@ -1,6 +1,6 @@
 
 <mat-card class="d-flex align-items-center justify-content-center gap-1">
-  <button mat-icon-button color="primary" aria-label="Review filter button">
+  <button mat-icon-button color="primary" i18n-aria-label aria-label="Review filter button">
       <mat-icon>filter_list</mat-icon>
   </button>
   <form class="d-flex gap-2 flex-wrap" [formGroup]="filterForm">
@@ -12,7 +12,9 @@
       <mat-form-field>
         <mat-label i18n>Group</mat-label>
         <input type="text"
+                i18n-placeholder
                 placeholder="Pick one"
+                i18n-aria-label
                 aria-label="Number"
                 matInput
                 formControlName="group"
