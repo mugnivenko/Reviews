@@ -25,16 +25,16 @@ export class AppComponent implements OnInit, OnDestroy {
       .subscribe((theme) => {
         const oldTheme = this.theme;
         this.theme = theme;
-        this.applyThemeOnOverlays(theme, oldTheme);
+        this.applyThemeOnOverlays(`${theme}-overlay`, `${oldTheme}-overlay`);
       });
   }
 
-  private applyThemeOnOverlays(newTheme: string, oldTheme?: string) {
+  private applyThemeOnOverlays(newThemeClass: string, oldThemeClass?: string) {
     const overlayContainerClasses =
       this.overlayContainer.getContainerElement().classList;
-    overlayContainerClasses.add(newTheme);
-    if (oldTheme !== undefined) {
-      overlayContainerClasses.remove(oldTheme);
+    overlayContainerClasses.add(newThemeClass);
+    if (oldThemeClass !== undefined) {
+      overlayContainerClasses.remove(oldThemeClass);
     }
   }
 

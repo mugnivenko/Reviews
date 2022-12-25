@@ -39,12 +39,23 @@ $light-theme: mat.define-light-theme((
  ),
 ));
 
+.light-theme-overlay {
+  @include mat.all-component-themes($light-theme);
+  @include mat.core-color($light-theme);
+  @include mat.button-color($light-theme);
+}
+
 .light-theme {
   @include mat.all-component-themes($light-theme);
   @include mat.core-color($light-theme);
   @include mat.button-color($light-theme);
 }
 
+.dark-theme-overlay {
+  @include mat.all-component-themes($dark-theme);
+  @include mat.core-theme($dark-theme);
+  @include mat.button-theme($dark-theme);
+}
 
 .dark-theme {
   @include mat.all-component-themes($dark-theme);
@@ -53,4 +64,3 @@ $light-theme: mat.define-light-theme((
   background: var(--bs-dark);
   color: var(--bs-white);
 }
-

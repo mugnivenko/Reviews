@@ -21,7 +21,7 @@ export class HttpClientInterceptor implements HttpInterceptor {
     next: HttpHandler
   ): Observable<HttpEvent<unknown>> {
     const clonedRequest = request.clone({
-      url: `${this.baseUrl}${request.url}`,
+      url: `${this.baseUrl}api/${request.url}`,
     });
 
     return next.handle(clonedRequest);

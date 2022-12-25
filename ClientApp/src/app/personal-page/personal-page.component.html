@@ -1,0 +1,5 @@
+<app-review-filter (filters)="filters.next($event)"></app-review-filter>
+<app-reviews-table (sortChange)="sortState.next($event)"
+                   [state]="state"
+                   [reviews]="(reviews | async)">
+</app-reviews-table>

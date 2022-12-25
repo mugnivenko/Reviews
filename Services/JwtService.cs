@@ -37,6 +37,7 @@ public class JwtService
     {
         return new ClaimsIdentity(new[]
         {
+            new Claim("id", user.Id.ToString()),
             new Claim("userName", user.UserName ?? ""),
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),

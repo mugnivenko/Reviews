@@ -40,7 +40,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         switchMap((user) => {
           this.isLoading = true;
           return this.httpClient.post<{ token: string }>(
-            `api/account/oauth2`,
+            `account/oauth2`,
             user
           );
         }),

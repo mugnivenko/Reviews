@@ -37,4 +37,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
         base.OnModelCreating(builder);
     }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    => optionsBuilder.LogTo(Console.WriteLine);
 }

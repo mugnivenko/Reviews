@@ -1,4 +1,4 @@
-import { Uuid } from 'src/app/shared/uuid.model';
+import type { Uuid } from 'src/app/shared/models/uuid.model';
 
 export type User = {
   token: string;

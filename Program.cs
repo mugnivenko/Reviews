@@ -71,6 +71,11 @@ builder.Services.AddControllers();
 
 builder.Services.AddScoped<AccountService>();
 builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<ReviewService>();
+builder.Services.AddScoped<GroupService>();
+builder.Services.AddScoped<PieceService>();
+
+builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddHttpClient();
 

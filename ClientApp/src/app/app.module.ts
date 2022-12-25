@@ -11,6 +11,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 
+import { AppPaths } from 'src/app/shared/enums/app-paths.enum';
+
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
@@ -19,6 +21,7 @@ import { FetchDataComponent } from './fetch-data/fetch-data.component';
 import { AuthorizeInterceptor } from './authorization/authorize.interceptor';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { HttpClientInterceptor } from './http-client.interceptor';
+import { PersonalPageModule } from './personal-page/personal-page.module';
 
 @NgModule({
   declarations: [
@@ -33,12 +36,13 @@ import { HttpClientInterceptor } from './http-client.interceptor';
     HttpClientModule,
     FormsModule,
     AuthorizationModule,
+    PersonalPageModule,
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,
     MatSidenavModule,
     RouterModule.forRoot([
-      { path: '', component: HomeComponent, pathMatch: 'full' },
+      { path: AppPaths.Home, component: HomeComponent, pathMatch: 'full' },
       { path: 'counter', component: CounterComponent },
       { path: 'fetch-data', component: FetchDataComponent },
     ]),

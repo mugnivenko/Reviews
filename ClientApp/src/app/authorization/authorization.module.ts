@@ -8,11 +8,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { SocialLoginModule } from '@abacritt/angularx-social-login';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 
+import { AppPaths } from 'src/app/shared/enums/app-paths.enum';
+
 import { LoginService } from './login/login.service';
 import { LoginComponent } from './login/login.component';
 
 import { socialLoginConfig } from './social-login-config';
-
 @NgModule({
   declarations: [LoginComponent],
   imports: [
@@ -20,7 +21,9 @@ import { socialLoginConfig } from './social-login-config';
     MatButtonModule,
     HttpClientModule,
     SocialLoginModule,
-    RouterModule.forRoot([{ path: 'login', component: LoginComponent }]),
+    RouterModule.forChild([
+      { path: AppPaths.Login, component: LoginComponent },
+    ]),
     AngularSvgIconModule,
     MatProgressSpinnerModule,
   ],

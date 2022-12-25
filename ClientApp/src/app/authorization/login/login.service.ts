@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import jwt_decode from 'jwt-decode';
+import { decodeJwt } from 'jose';
 
 import { AuthorizeService } from '../authorize.service';
 
@@ -11,10 +11,8 @@ export class LoginService {
   constructor(private authorizeServise: AuthorizeService) {}
 
   saveJwtTokenPayload(token: string) {
-    const payload: JwtPayload = jwt_decode(token);
-    console.log({ payload });
-
-    const { sub, userName, email } = payload;
+    const payload = decodeJwt(token);
+    const { sub, userName, email } = payload as JwtPayload;
     this.authorizeServise.setUser({ token, id: sub, userName, email });
   }
 }
