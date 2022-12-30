@@ -1,3 +1,19 @@
+
+<mat-card class="mt-4">
+
+</mat-card>
+
+<div class="flex justify-end mt-4 mb-2">
+  <button (click)="handleAdd()" 
+          mat-raised-button
+          color="primary"
+          i18n-aria-label
+          aria-label="review add icon button with plus icon"
+  >
+    <mat-icon>add</mat-icon>
+    <span i18n>Add review</span>
+  </button>
+</div>
 <app-review-filter (filters)="filters.next($event)"></app-review-filter>
 <app-reviews-table (sortChange)="sortState.next($event)"
                    [state]="state"

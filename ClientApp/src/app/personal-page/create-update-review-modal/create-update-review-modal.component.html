@@ -1,0 +1,103 @@
+<h1 mat-dialog-title i18n>New review</h1>
+<mat-dialog-content>
+    <form [formGroup]="reviewForm" class="w-100">
+      <mat-form-field class="w-full" appearance="fill">
+        <mat-label i18n>Name</mat-label>
+        <input matInput
+               formControlName="name"
+               i18n-placeholder
+               placeholder="Enter name">
+      </mat-form-field>
+      <mat-form-field class="w-full" appearance="fill">
+        <mat-label i18n>Group</mat-label>
+        <mat-select (selectionChange)="groupChange($event)">
+          <mat-option *ngFor="let group of groups | async" [value]="group.name">
+            {{ group.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="w-full" appearance="fill">
+        <mat-label i18n>Piece</mat-label>
+        <input matInput
+               formControlName="piece"
+               i18n-placeholder
+               placeholder="Enter piece">
+      </mat-form-field>
+      <div class="pb-3" #editorRef></div>
+      <mat-form-field class="w-full" appearance="fill">
+        <mat-label i18n>Grade</mat-label>
+        <input matInput
+               type="number"
+               min="1"
+               max="10"
+               formControlName="grade"
+               i18n-placeholder
+               placeholder="Enter grade">
+      </mat-form-field>
+      <mat-form-field class="w-full" appearance="fill">
+        <mat-label i18n>Tags</mat-label>
+        <mat-chip-list #chipList i18n-aria-label aria-label="Tags selection">
+          <mat-chip
+            *ngFor="let tag of addedTags"
+            (removed)="removeTag(tag)">
+            {{ tag }}
+            <button matChipRemove>
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip>
+          <input
+            i18n-placeholder
+            placeholder="New tag"
+            #tagsInputRef
+            [formControl]="tagsInput"
+            [matAutocomplete]="auto"
+            [matChipInputFor]="chipList"
+            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+            (matChipInputTokenEnd)="addTag($event)">
+        </mat-chip-list>
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedTag($event)">
+          <mat-option [class.hidden]="tagsState === QueryState.Loading"
+                      *ngFor="let tag of tags | async"
+                      [value]="tag.name">
+            {{ tag.name }}
+          </mat-option>
+          <mat-option class="tags-spinner"
+                      *ngIf="tagsState === QueryState.Loading">
+            <mat-progress-spinner
+              color="primary" 
+              mode="indeterminate">
+            </mat-progress-spinner>
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </form>
+    <div class="upload-box-content">
+      <div
+        class="drop-container flex justify-center items-center w-full h-36"
+        ngFileDrop
+        [options]="options"
+        (uploadOutput)="onUploadOutput($event)"
+        [uploadInput]="uploadInput"
+        [class.is-drop-over]="dragOver"
+      >
+        <p>
+          Drag files here or
+          <label class="upload-button">
+            <input
+              type="file"
+              ngFileSelect
+              [options]="options"
+              (uploadOutput)="onUploadOutput($event)"
+              [uploadInput]="uploadInput"
+              multiple> 
+              browse
+          </label>
+          to upload.
+        </p>
+      </div>
+    </div>
+</mat-dialog-content>
+<div class="justify-end" mat-dialog-actions>
+  <button mat-button (click)="onCancelClick()">Cancel</button>
+  <button mat-button (click)="onConfirmClick()" [disabled]="reviewForm.invalid">Create</button>
+</div>

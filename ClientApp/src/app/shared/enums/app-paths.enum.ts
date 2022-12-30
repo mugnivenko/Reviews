@@ -1,5 +1,5 @@
 export enum AppPaths {
   Home = '',
   Login = 'login',
-  PersonalPage = 'me',
+  PersonalPage = 'user/:id',
 }

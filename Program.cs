@@ -74,6 +74,7 @@ builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<ReviewService>();
 builder.Services.AddScoped<GroupService>();
 builder.Services.AddScoped<PieceService>();
+builder.Services.AddScoped<TagService>();
 
 builder.Services.AddAutoMapper(typeof(Program));
 

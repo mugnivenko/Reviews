@@ -1,66 +1,12 @@
-@use '@angular/material' as mat;
-
-a {
-  color: #0366d6;
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-code {
-  color: #e01a76; 
-}
-
-.btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
-@include mat.core();
-
-$dark-theme: mat.define-dark-theme((
- color: (
-   primary: mat.define-palette(mat.$pink-palette),
-   accent: mat.define-palette(mat.$blue-grey-palette),
- ),
-  typography: mat.define-typography-config(),
-  density: 0,
-));
-
-$light-theme: mat.define-light-theme((
- color: (
-   primary: mat.define-palette(mat.$indigo-palette),
-   accent: mat.define-palette(mat.$pink-palette),
- ),
-));
-
-.light-theme-overlay {
-  @include mat.all-component-themes($light-theme);
-  @include mat.core-color($light-theme);
-  @include mat.button-color($light-theme);
-}
-
-.light-theme {
-  @include mat.all-component-themes($light-theme);
-  @include mat.core-color($light-theme);
-  @include mat.button-color($light-theme);
-}
-
-.dark-theme-overlay {
-  @include mat.all-component-themes($dark-theme);
-  @include mat.core-theme($dark-theme);
-  @include mat.button-theme($dark-theme);
-}
-
-.dark-theme {
-  @include mat.all-component-themes($dark-theme);
-  @include mat.core-theme($dark-theme);
-  @include mat.button-theme($dark-theme);
-  background: var(--bs-dark);
-  color: var(--bs-white);
+:root {
+  --background-dark: #303030;
+  --white: #fff;
+  --error: rgb(211, 47, 47);
 }

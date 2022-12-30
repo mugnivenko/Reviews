@@ -1,6 +1,6 @@
 
-<div class="d-flex justify-content-center">
-    <div class="d-flex flex-column w-50 gap-2 wrapper">
+<div class="flex justify-center">
+    <div class="flex flex-col w-1/2 gap-2 wrapper">
         <div *ngIf="isLoading; then loading else content"></div>
         <ng-template #content>
             <asl-google-signin-button 

@@ -10,17 +10,22 @@ import {
   throwError,
 } from 'rxjs';
 import { HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
+
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+
+import { MatDialog } from '@angular/material/dialog';
 
 import { Review } from 'src/app/shared/models/review.model';
 import { AuthorizeService } from 'src/app/authorization/authorize.service';
 
 import { ReviewService } from 'src/app/shared/services/review.service';
 import { NotificationService } from 'src/app/notification/notification.service';
-import type { Uuid } from 'src/app/shared/models/uuid.model';
 import { QueryState } from 'src/app/shared/enums/query-state.enum';
 
-import { FilterSort } from './shared/filters-sort.model';
+import type { FilterSort } from './shared/filters-sort.model';
+
+import { CreateUpdateReviewModalComponent } from './create-update-review-modal/create-update-review-modal.component';
 
 @UntilDestroy()
 @Component({
@@ -45,12 +50,20 @@ export class PersonalPageComponent implements OnInit {
 
   constructor(
     private authorizeService: AuthorizeService,
-
     private reviewService: ReviewService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private dialog: MatDialog,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    const userId = this.route.snapshot.paramMap.get('id');
+    this.getSortFilterChanges();
+  }
+
+  getUser() {}
+
+  getSortFilterChanges() {
     const filters$ = this.filters.pipe(
       startWith({
         dateEnd: '',
@@ -65,8 +78,6 @@ export class PersonalPageComponent implements OnInit {
     this.sortState
       .pipe(combineLatestWith(filters$), untilDestroyed(this))
       .subscribe(([state, filter]) => {
-        console.log(state, filter);
-
         this.getSortedReview(
           this.getSortParams({
             active: state.active,
@@ -104,5 +115,15 @@ export class PersonalPageComponent implements OnInit {
     }
 
     return throwError(() => err);
+  }
+
+  handleAdd() {
+    const dialogRef = this.dialog.open(CreateUpdateReviewModalComponent, {
+      data: { name: 'this.name', animal: 'this.animal' },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log('The dialog was closed', result);
+    });
   }
 }

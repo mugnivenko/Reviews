@@ -2,10 +2,11 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Observable, Subject, map, takeUntil } from 'rxjs';
 
-import { ThemeService } from '../theme/theme.service';
-import { AuthorizeService } from '../authorization/authorize.service';
+import { ThemeService } from 'src/app/theme/theme.service';
+import { AuthorizeService } from 'src/app/authorization/authorize.service';
 
-import { Theme } from '../theme/shared/theme.enum';
+import { Theme } from 'src/app/theme/shared/theme.enum';
+import type { Uuid } from 'src/app/shared/models/uuid.model';
 
 @Component({
   selector: 'app-nav-menu',
@@ -14,6 +15,7 @@ import { Theme } from '../theme/shared/theme.enum';
 })
 export class NavMenuComponent implements OnInit, OnDestroy {
   public isAuthenticated?: Observable<boolean>;
+  public userId?: Observable<Uuid | undefined>;
   public userName?: Observable<string | undefined>;
   public theme?: Theme;
   public Theme = Theme;
@@ -26,6 +28,7 @@ export class NavMenuComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.isAuthenticated = this.authorizeService.isAuthorized();
+    this.userId = this.authorizeService.getUserId();
     this.userName = this.authorizeService
       .getUser()
       .pipe(map((user) => user?.userName));

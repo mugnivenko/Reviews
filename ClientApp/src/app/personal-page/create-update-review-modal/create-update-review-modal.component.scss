@@ -1,0 +1,37 @@
+.upload-box-content {
+  .upload-item, .drop-container {
+    box-shadow:
+      rgb(0 0 0 / 60%) 0px 15px 10px -20px inset,
+      rgb(0 0 0 / 60%) 0px 5px 50px -10px inset;
+  }
+
+  .is-drop-over {
+    border: 1px solid green;
+  }
+
+  .drop-container {
+    p {
+      font-size: 16px;
+      font-weight: 400;
+      margin: 0;
+      color: #8793A2;
+    }
+  }
+
+  .upload-button {
+    display: inline-block;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0 2px;
+
+    input {
+      display: none;
+    }
+  }
+}
+
+.tags-spinner {
+  height: 128px;
+}

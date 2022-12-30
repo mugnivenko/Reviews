@@ -5,10 +5,10 @@ using Reviews.Models.Dto;
 
 namespace Reviews.Mappers;
 
-public class GroupProfile : Profile
+public class TagProfile : Profile
 {
-    public GroupProfile()
+    public TagProfile()
     {
-        CreateMap<Group, GroupDto>();
+        CreateMap<Tag, TagDto>();
     }
 }

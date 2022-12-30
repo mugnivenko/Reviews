@@ -1,3 +1,10 @@
-.microsoft-button {
+:host .microsoft-button {
     width: fit-content;
+
+    ::ng-deep {
+        span {
+            display: flex;
+            gap: 8px;
+        }
+    }
 }

@@ -11,7 +11,7 @@
   <a *ngIf="!(isAuthenticated | async)" class="navbar-brand" [routerLink]="['/login']" i18n
     >Sign in</a
   >
-  <a *ngIf="(isAuthenticated | async)" class="navbar-brand" [routerLink]="['/me']"
+  <a *ngIf="(isAuthenticated | async)" class="navbar-brand" [routerLink]="['/user', userId | async]"
     >{{ userName | async }}</a
   >
 </mat-toolbar>
