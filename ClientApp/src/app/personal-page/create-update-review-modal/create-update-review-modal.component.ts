@@ -90,6 +90,10 @@ export class CreateUpdateReviewModalComponent implements OnInit {
   options: UploaderOptions;
   files: UploadFile[] = [];
 
+  dragFilesHereOr = $localize`Drag files here or`;
+  browse = $localize`browse`;
+  toUpload = $localize`to upload.`;
+
   constructor(
     private dialogRef: MatDialogRef<CreateUpdateReviewModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ReviewDialogData,

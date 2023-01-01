@@ -82,7 +82,7 @@
         [class.is-drop-over]="dragOver"
       >
         <p>
-          Drag files here or
+          {{ dragFilesHereOr }}
           <label class="upload-button">
             <input
               type="file"
@@ -91,9 +91,9 @@
               (uploadOutput)="onUploadOutput($event)"
               [uploadInput]="uploadInput"
               accept="image/*"> 
-              browse
+              {{ browse }}
           </label>
-          to upload.
+          {{ toUpload }}
         </p>
       </div>
     </div>
@@ -128,6 +128,6 @@
     </div>
 </mat-dialog-content>
 <div class="justify-end" mat-dialog-actions>
-  <button mat-button (click)="onCancelClick()">Cancel</button>
-  <button mat-button (click)="onConfirmClick()" [disabled]="reviewForm.invalid">Create</button>
+  <button mat-button (click)="onCancelClick()" i18n>Cancel</button>
+  <button mat-button (click)="onConfirmClick()" [disabled]="reviewForm.invalid" i18n>Create</button>
 </div>
