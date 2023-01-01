@@ -7,7 +7,6 @@ import {
   ViewChild,
 } from '@angular/core';
 import {
-  AbstractControl,
   FormArray,
   FormBuilder,
   FormControl,
@@ -33,17 +32,20 @@ import {
 
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
-import { serializerCtx, Editor, editorViewCtx, rootCtx } from '@milkdown/core';
-import { commonmark } from '@milkdown/preset-commonmark';
+import { gfm } from '@milkdown/preset-gfm';
+import { menu } from '@milkdown/plugin-menu';
 import { nord } from '@milkdown/theme-nord';
 import { tokyo } from '@milkdown/theme-tokyo';
 import { slash } from '@milkdown/plugin-slash';
-import { menu } from '@milkdown/plugin-menu';
-import { gfm } from '@milkdown/preset-gfm';
+import { commonmark } from '@milkdown/preset-commonmark';
+import { serializerCtx, Editor, editorViewCtx, rootCtx } from '@milkdown/core';
 
 import { TagService } from 'src/app/shared/services/tag.service';
+import { ThemeService } from 'src/app/theme/theme.service';
 import { GroupService } from 'src/app/shared/services/group.service';
+
 import { QueryState } from 'src/app/shared/enums/query-state.enum';
+import { Theme } from 'src/app/theme/shared/theme.enum';
 
 import type { Tag } from 'src/app/shared/models/tag.model';
 import type { Group } from 'src/app/shared/models/group.model';
@@ -93,7 +95,8 @@ export class CreateUpdateReviewModalComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: ReviewDialogData,
     private formBuilder: FormBuilder,
     private groupService: GroupService,
-    private tagService: TagService
+    private tagService: TagService,
+    private themeService: ThemeService
   ) {
     this.options = {
       concurrency: 1,
@@ -124,16 +127,26 @@ export class CreateUpdateReviewModalComponent implements OnInit {
   }
 
   async createEditor() {
+    const theme = await this.getEditorTheme();
     this.editor = await Editor.make()
       .config((ctx) => {
         ctx.set(rootCtx, this.editorRef?.nativeElement);
       })
-      .use(tokyo)
+      .use(theme)
       .use(commonmark)
       .use(slash)
       .use(menu)
       .use(gfm)
       .create();
+  }
+
+  async getEditorTheme() {
+    const theme = await firstValueFrom(this.themeService.getTheme());
+    const editorTheme = {
+      [Theme.Dark]: tokyo,
+      [Theme.Light]: nord,
+    };
+    return editorTheme[theme];
   }
 
   getMarkdown() {

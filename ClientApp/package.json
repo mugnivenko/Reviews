@@ -34,6 +34,7 @@
     "@milkdown/prose": "^6.5.4",
     "@milkdown/theme-nord": "^6.5.4",
     "@milkdown/theme-tokyo": "^6.5.4",
+    "@milkdown/utils": "^6.5.4",
     "@ngneat/until-destroy": "^9.2.2",
     "angular-svg-icon": "^14.0.0",
     "jose": "^4.11.1",
