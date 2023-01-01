@@ -43,6 +43,7 @@ import { serializerCtx, Editor, editorViewCtx, rootCtx } from '@milkdown/core';
 import { TagService } from 'src/app/shared/services/tag.service';
 import { ThemeService } from 'src/app/theme/theme.service';
 import { GroupService } from 'src/app/shared/services/group.service';
+import { NotificationService } from 'src/app/notification/notification.service';
 
 import { QueryState } from 'src/app/shared/enums/query-state.enum';
 import { Theme } from 'src/app/theme/shared/theme.enum';
@@ -100,7 +101,8 @@ export class CreateUpdateReviewModalComponent implements OnInit {
     private formBuilder: FormBuilder,
     private groupService: GroupService,
     private tagService: TagService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private notificationService: NotificationService
   ) {
     this.options = {
       concurrency: 1,
@@ -263,7 +265,10 @@ export class CreateUpdateReviewModalComponent implements OnInit {
         this.removeFileFromForm(output.file?.response.uri);
       },
       rejected: (output: UploadOutput) => {
-        console.log({ output });
+        this.notificationService.error({
+          message: $localize`The specified file ${output.file?.name} could not be uploaded.`,
+          description: $localize`Only files with the following extensions are allowed: bmp jpeg x-png png gif.`,
+        });
       },
       removedAll: () => {
         // TODO: multiply file upload

@@ -46,6 +46,10 @@ export class NavMenuComponent implements OnInit, OnDestroy {
     );
   }
 
+  logout() {
+    this.authorizeService.logout();
+  }
+
   ngOnDestroy() {
     this.notifier.next(null);
     this.notifier.complete();

@@ -5,6 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
+using Reviews.Data;
 using Reviews.Models;
 
 namespace Reviews.Services;
@@ -21,12 +22,15 @@ public class AccountService
     private readonly HttpClient _httpClient;
     private readonly JwtService _jwtService;
 
+    private readonly ApplicationDbContext _context;
+
     public AccountService(
         IConfiguration configuration,
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         HttpClient httpClient,
-        JwtService jwtService)
+        JwtService jwtService,
+        ApplicationDbContext context)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -34,6 +38,7 @@ public class AccountService
         _microsoftSettings = configuration.GetSection("Authentication:Microsoft");
         _httpClient = httpClient;
         _jwtService = jwtService;
+        _context = context;
     }
 
     public async Task<string?> ExternalLogin(CredentialsDto credentials) =>
@@ -161,5 +166,10 @@ public class AccountService
         await _userManager.CreateAsync(user);
         await _userManager.AddLoginAsync(user, info);
         return user;
+    }
+
+    public ApplicationUser GetUser(Guid id)
+    {
+        return _context.Users.Where((user) => user.Id == id).First();
     }
 }

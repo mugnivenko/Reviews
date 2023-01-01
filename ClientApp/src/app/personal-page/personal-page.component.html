@@ -1,6 +1,35 @@
 
-<mat-card class="mt-4">
-
+<mat-card class="user-info flex-col mt-4">
+  <span class="mat-body mb-2">ABOUT</span>
+  <ng-container *ngIf="userState === QueryState.Success">
+    <div class="flex items-center gap-3">
+      <span class="mat-subheading-2 info-title" i18n>User name:</span>
+      <span class="mat-body">{{ user?.userName }}</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="mat-subheading-2 info-title" i18n>Email:</span>
+      <span class="mat-body">{{ user?.email }}</span>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="userState === QueryState.Loading">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </ng-container>
+  <div class="flex items-center gap-3">
+    <span class="mat-subheading-2 info-title" i18n>Language:</span>
+    <div>
+      <span class="mat-body">{{ language | async }}</span>
+      <button mat-icon-button [matMenuTriggerFor]="menu">
+        <mat-icon class="text-xl">settings</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button *ngFor="let language of languages"
+                mat-menu-item
+                (click)="languageSelect(language.code)">
+            {{ language.name }}
+        </button>
+      </mat-menu>
+    </div>
+  </div>
 </mat-card>
 
 <div class="flex justify-end mt-4 mb-2">
@@ -16,6 +45,6 @@
 </div>
 <app-review-filter (filters)="filters.next($event)"></app-review-filter>
 <app-reviews-table (sortChange)="sortState.next($event)"
-                   [state]="state"
+                   [state]="reviewState"
                    [reviews]="(reviews | async)">
 </app-reviews-table>

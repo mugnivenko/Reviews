@@ -16,12 +16,17 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
 import { MatDialog } from '@angular/material/dialog';
 
-import { Review } from 'src/app/shared/models/review.model';
+import type { Review } from 'src/app/shared/models/review.model';
+import type { User } from 'src/app/shared/models/user.model';
 import { AuthorizeService } from 'src/app/authorization/authorize.service';
 
+import { UserService } from 'src/app/shared/services/user.service';
 import { ReviewService } from 'src/app/shared/services/review.service';
+import { LanguageService } from 'src/app/shared/services/language.service';
 import { NotificationService } from 'src/app/notification/notification.service';
+
 import { QueryState } from 'src/app/shared/enums/query-state.enum';
+import { AvailableLanguages } from 'src/app/shared/models/available-languages.model';
 
 import type { FilterSort } from './shared/filters-sort.model';
 
@@ -34,7 +39,7 @@ import { CreateUpdateReviewModalComponent } from './create-update-review-modal/c
   styleUrls: ['./personal-page.component.scss'],
 })
 export class PersonalPageComponent implements OnInit {
-  state = QueryState.Idle;
+  reviewState = QueryState.Idle;
 
   filters = new Subject<{
     dateEnd: string;
@@ -48,20 +53,57 @@ export class PersonalPageComponent implements OnInit {
   sortState = new Subject<{ active: string; direction: string }>();
   reviews?: Observable<Review[]>;
 
+  user?: User;
+  userState = QueryState.Idle;
+
+  language?: Observable<string>;
+  languages: { code: AvailableLanguages; name: string }[];
+
   constructor(
     private authorizeService: AuthorizeService,
     private reviewService: ReviewService,
     private notificationService: NotificationService,
     private dialog: MatDialog,
-    private route: ActivatedRoute
-  ) {}
-
-  ngOnInit(): void {
-    const userId = this.route.snapshot.paramMap.get('id');
-    this.getSortFilterChanges();
+    private route: ActivatedRoute,
+    private userService: UserService,
+    private languageService: LanguageService
+  ) {
+    this.languages = languageService.getLanguagesWithCodes();
+    this.getLanguage();
   }
 
-  getUser() {}
+  ngOnInit(): void {
+    this.getSortFilterChanges();
+    this.getUser();
+  }
+
+  get QueryState() {
+    return QueryState;
+  }
+
+  getLanguage() {
+    this.languageService.getSelectedLanguage().subscribe((aaaaaaaa) => {
+      console.log(aaaaaaaa);
+    });
+
+    this.language = this.languageService.getSelectedLanguage();
+  }
+
+  getUser() {
+    const userId = this.route.snapshot.paramMap.get('id');
+    if (userId === null) return;
+    this.userState = QueryState.Loading;
+    this.userService
+      .getUser(userId)
+      .pipe(
+        catchError((err) => this.processError(err)),
+        untilDestroyed(this)
+      )
+      .subscribe((user) => {
+        this.user = user;
+        this.userState = QueryState.Success;
+      });
+  }
 
   getSortFilterChanges() {
     const filters$ = this.filters.pipe(
@@ -96,11 +138,11 @@ export class PersonalPageComponent implements OnInit {
 
   async getSortedReview(params: HttpParams) {
     const id = (await firstValueFrom(this.authorizeService.getUserId())) ?? '';
-    this.state = QueryState.Loading;
+    this.reviewState = QueryState.Loading;
     this.reviews = this.reviewService.getUserReviews(id, params).pipe(
       catchError((err) => this.processError(err)),
       tap((src) => {
-        this.state = QueryState.Success;
+        this.reviewState = QueryState.Success;
         return src;
       })
     );
@@ -125,5 +167,9 @@ export class PersonalPageComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       console.log('The dialog was closed', result);
     });
+  }
+
+  languageSelect(code: AvailableLanguages) {
+    this.languageService.set(code);
   }
 }

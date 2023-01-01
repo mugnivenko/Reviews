@@ -55,6 +55,22 @@
         >
             <mat-icon>edit</mat-icon>
         </button>
+        <button
+          (click)="handlePreview(element.id)" 
+          mat-icon-button
+          i18n-aria-label
+          aria-label="review preview icon button with pencil icon"
+        >
+            <mat-icon>preview</mat-icon>
+        </button>
+        <button
+          (click)="handleDelete(element.id)" 
+          mat-icon-button
+          i18n-aria-label
+          aria-label="review preview icon button with pencil icon"
+        >
+            <mat-icon>delete_forever</mat-icon>
+        </button>
     </td>
   </ng-container>
 

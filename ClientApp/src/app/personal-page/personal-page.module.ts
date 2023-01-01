@@ -6,6 +6,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSortModule } from '@angular/material/sort';
 import { MatCardModule } from '@angular/material/card';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatInputModule } from '@angular/material/input';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTableModule } from '@angular/material/table';
@@ -24,6 +25,8 @@ import { NgxUploaderModule } from 'ngx-uploader';
 
 import { AppPaths } from 'src/app/shared/enums/app-paths.enum';
 import { NotificationModule } from 'src/app/notification/notification.module';
+
+import { AuthorizationGuard } from 'src/app/authorization/authorization.guard';
 
 import { PersonalPageComponent } from './personal-page.component';
 import { ReviewsTableComponent } from './reviews-table/reviews-table.component';
@@ -45,11 +48,16 @@ import { CreateUpdateReviewModalComponent } from './create-update-review-modal/c
     NotificationModule,
     NgxUploaderModule,
     RouterModule.forChild([
-      { path: AppPaths.PersonalPage, component: PersonalPageComponent },
+      {
+        path: AppPaths.PersonalPage,
+        component: PersonalPageComponent,
+        canActivate: [AuthorizationGuard],
+      },
     ]),
     MatSortModule,
     MatIconModule,
     MatCardModule,
+    MatMenuModule,
     MatInputModule,
     MatTableModule,
     MatChipsModule,

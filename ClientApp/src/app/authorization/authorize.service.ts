@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 
 import { BehaviorSubject, map } from 'rxjs';
 
+import { AppPaths } from 'src/app/shared/enums/app-paths.enum';
+
 import { User } from './shared/user.model';
 
 @Injectable({
@@ -13,7 +15,7 @@ export class AuthorizeService {
   private userSubject: BehaviorSubject<User | null> =
     new BehaviorSubject<User | null>(null);
 
-  constructor(router: Router) {
+  constructor(private router: Router) {
     const stringifiedUser = localStorage.getItem(this.storageKey);
     if (stringifiedUser === null) {
       return;
@@ -46,5 +48,8 @@ export class AuthorizeService {
   logout() {
     this.userSubject.next(null);
     localStorage.removeItem(this.storageKey);
+    this.router.navigate([AppPaths.Home]).then(() => {
+      window.location.reload();
+    });
   }
 }

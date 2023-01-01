@@ -60,6 +60,14 @@ export class ReviewsTableComponent implements OnChanges {
     console.log(id);
   }
 
+  handlePreview(id: string) {
+    console.log(id);
+  }
+
+  handleDelete(id: string) {
+    console.log(id);
+  }
+
   announceSortChange(sortData: Sort) {
     this.sortChange.emit(sortData);
   }

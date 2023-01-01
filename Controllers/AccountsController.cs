@@ -1,22 +1,26 @@
-using Microsoft.AspNetCore.Authorization;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 using Reviews.Models;
 using Reviews.Services;
+using Reviews.Models.Dto;
 
 namespace Reviews.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AccountController : ControllerBase
+public class AccountsController : ControllerBase
 {
 
-    AccountService _service;
+    private readonly AccountService _service;
+
+    private readonly IMapper _mapper;
 
 
-    public AccountController(AccountService service)
+    public AccountsController(AccountService service, IMapper mapper)
     {
         _service = service;
+        _mapper = mapper;
     }
 
     [HttpPost("oauth2")]
@@ -30,11 +34,10 @@ public class AccountController : ControllerBase
         return Ok(new { token = jwtToken });
     }
 
-    [HttpGet("aboba")]
-    [Authorize]
-    public ActionResult GetAboba()
+    [HttpGet("{id}")]
+    public ActionResult GetUser(Guid id)
     {
-        Console.WriteLine(User.Claims.FirstOrDefault(claim => claim.Type == "Id"));
-        return Ok("Abobbe");
+        ApplicationUser user = _service.GetUser(id);
+        return Ok(_mapper.Map<UserDto>(user));
     }
 }
