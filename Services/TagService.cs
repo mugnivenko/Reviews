@@ -7,7 +7,7 @@ namespace Reviews.Services;
 
 public class TagService
 {
-    ApplicationDbContext _context;
+    private readonly ApplicationDbContext _context;
     public TagService(ApplicationDbContext context)
     {
         _context = context;

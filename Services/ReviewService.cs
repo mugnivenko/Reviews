@@ -9,7 +9,7 @@ namespace Reviews.Services;
 
 public class ReviewService
 {
-    ApplicationDbContext _context;
+    private readonly ApplicationDbContext _context;
     public ReviewService(ApplicationDbContext context)
     {
         _context = context;
@@ -23,6 +23,16 @@ public class ReviewService
                 .Range(sortFilterReview.GradeFrom, sortFilterReview.GradeTo)
                 .Contains(review.Grade)
             );
+        AddSort(ref query, sortFilterReview);
+        AddFilter(ref query, sortFilterReview);
+        return await query
+            .Include(review => review.Group)
+            .Include(review => review.Piece)
+            .ToListAsync();
+    }
+
+    private void AddSort(ref IQueryable<Review> query, SortFilterReviewDto sortFilterReview)
+    {
         query = sortFilterReview switch
         {
             { Name: not null } and { Name: not "" } => query.Where(review => review.Name.Contains(sortFilterReview.Name)),
@@ -32,15 +42,16 @@ public class ReviewService
             { DateEnd: not null } => query.Where(review => review.CreatedAt <= sortFilterReview.DateEnd),
             _ => query
         };
+    }
+
+    private void AddFilter(ref IQueryable<Review> query, SortFilterReviewDto sortFilterReview)
+    {
         query = sortFilterReview.Active switch
         {
-            var active when active == "group" || active == "piece"
-            => query.OrderBy($"{sortFilterReview.Active}.Name {sortFilterReview.Direction}"),
+            var active when active == "group" || active == "piece" =>
+                query.OrderBy($"{sortFilterReview.Active}.Name {sortFilterReview.Direction}"),
             _ => query.OrderBy($"{sortFilterReview.Active} {sortFilterReview.Direction}"),
         };
-        return await query
-            .Include(review => review.Group)
-            .Include(review => review.Piece)
-            .ToListAsync();
     }
+
 }

@@ -37,6 +37,7 @@
     "@ngneat/until-destroy": "^9.2.2",
     "angular-svg-icon": "^14.0.0",
     "jose": "^4.11.1",
+    "ngx-toastr": "^15.2.2",
     "ngx-uploader": "^11.0.0",
     "oidc-client": "^1.11.5",
     "popper.js": "^1.16.0",

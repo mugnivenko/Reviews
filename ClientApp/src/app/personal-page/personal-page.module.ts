@@ -14,6 +14,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
@@ -58,6 +59,7 @@ import { CreateUpdateReviewModalComponent } from './create-update-review-modal/c
     MatFormFieldModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatProgressBarModule,
     MatAutocompleteModule,
     MatProgressSpinnerModule,
   ],

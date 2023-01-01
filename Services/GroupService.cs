@@ -7,7 +7,7 @@ namespace Reviews.Services;
 
 public class GroupService
 {
-    ApplicationDbContext _context;
+    private readonly ApplicationDbContext _context;
     public GroupService(ApplicationDbContext context)
     {
         _context = context;

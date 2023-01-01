@@ -16,22 +16,20 @@ import {
 import { HttpParams } from '@angular/common/http';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 
-import {
-  Observable,
-  catchError,
-  debounceTime,
-  firstValueFrom,
-  map,
-  tap,
-  throwError,
-} from 'rxjs';
+import { Observable, debounceTime, firstValueFrom, map } from 'rxjs';
 
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSelectChange } from '@angular/material/select';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
-import type { UploadInput, UploadOutput, UploaderOptions } from 'ngx-uploader';
+import {
+  UploadFile,
+  UploadInput,
+  UploadOutput,
+  UploadStatus,
+  UploaderOptions,
+} from 'ngx-uploader';
 
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
@@ -72,6 +70,10 @@ export class CreateUpdateReviewModalComponent implements OnInit {
       [],
       [Validators.required, Validators.minLength(1)]
     ),
+    files: this.formBuilder.array<string[]>(
+      [],
+      [Validators.required, Validators.minLength(1)]
+    ),
   });
 
   tagsState = QueryState.Idle;
@@ -84,6 +86,7 @@ export class CreateUpdateReviewModalComponent implements OnInit {
   uploadInput: EventEmitter<UploadInput>;
   dragOver: boolean = false;
   options: UploaderOptions;
+  files: UploadFile[] = [];
 
   constructor(
     private dialogRef: MatDialogRef<CreateUpdateReviewModalComponent>,
@@ -92,7 +95,17 @@ export class CreateUpdateReviewModalComponent implements OnInit {
     private groupService: GroupService,
     private tagService: TagService
   ) {
-    this.options = { concurrency: 1, maxUploads: 1 };
+    this.options = {
+      concurrency: 1,
+      maxUploads: 1,
+      allowedContentTypes: [
+        'image/bmp',
+        'image/jpeg',
+        'image/x-png',
+        'image/png',
+        'image/gif',
+      ],
+    };
     this.uploadInput = new EventEmitter<UploadInput>();
   }
 
@@ -184,33 +197,110 @@ export class CreateUpdateReviewModalComponent implements OnInit {
     this.selectedTags.removeAt(tagIndex);
   }
 
-  uploadActions: Record<string, (output: UploadOutput) => void> = {
-    dragOver: () => {
-      this.dragOver = true;
-    },
-    dragOut: () => {
-      this.dragOver = false;
-    },
-    drop: (output: UploadOutput) => {
-      this.dragOver = false;
-      console.log({ output });
-    },
-    done: () => {},
-    addedToQueue: (output: UploadOutput) => {
-      console.log({ output });
-    },
-    allAddedToQueue: () => {},
-    uploading: () => {},
-    start: () => {},
-    cancelled: () => {},
-    removed: () => {},
-    removedAll: () => {},
-    rejected: () => {},
-  };
+  uploadActions: Record<UploadOutput['type'], (output: UploadOutput) => void> =
+    {
+      dragOver: () => {
+        this.dragOver = true;
+      },
+      dragOut: () => {
+        this.dragOver = false;
+      },
+      drop: () => {
+        this.dragOver = false;
+      },
+      addedToQueue: (output: UploadOutput) => {
+        const { file } = output;
+        if (file === undefined) return;
+        this.files.push(file);
+      },
+      allAddedToQueue: (output: UploadOutput) => {
+        const event: UploadInput = {
+          type: 'uploadAll',
+          url: 'api/images',
+          method: 'POST',
+        };
+        this.uploadInput.emit(event);
+      },
+      uploading: (output: UploadOutput) => {
+        this.updateFile(output.file);
+      },
+      start: (output: UploadOutput) => {
+        this.updateFile(output.file);
+      },
+      cancelled: (output: UploadOutput) => {
+        console.log('cancelled', { output });
+        const { file } = output;
+        if (file === undefined) return;
+        this.notifyRemoveFile(file.id);
+      },
+      done: (output: UploadOutput) => {
+        this.updateFile(output.file);
+        const { uri } = output.file?.response;
+        if (typeof uri !== 'string') {
+          return;
+        }
+        this.addedFiles.push(new FormControl(uri));
+      },
+      removed: (output: UploadOutput) => {
+        this.files = this.files.filter((file) => file.id !== output.file?.id);
+        this.removeFileFromForm(output.file?.response.uri);
+      },
+      rejected: (output: UploadOutput) => {
+        console.log({ output });
+      },
+      removedAll: () => {
+        // TODO: multiply file upload
+      },
+    };
+
+  get UploadStatus() {
+    return UploadStatus;
+  }
+
+  updateFile(file?: UploadFile) {
+    if (file === undefined) {
+      return;
+    }
+    const index = this.files.findIndex(({ id }) => id === file.id);
+    this.files.splice(index, 1, file);
+  }
+
+  removeFile(id: string) {
+    this.files = this.files.filter((file) => file.id !== id);
+  }
+
+  notifyRemoveFile(id: string) {
+    this.uploadInput.emit({ type: 'remove', id });
+  }
 
   onUploadOutput(output: UploadOutput) {
     const action = this.uploadActions[output.type];
     action(output);
+  }
+
+  onFileDelete(id: string) {
+    this.notifyRemoveFile(id);
+  }
+
+  onFileCancel(id: string) {
+    this.uploadInput.emit({ type: 'cancel', id });
+  }
+
+  removeFileFromForm(uri: unknown) {
+    if (typeof uri !== 'string') {
+      return;
+    }
+    const fileIndex = this.addedFiles.value.findIndex(
+      (addedUri: string) => addedUri === uri
+    );
+    if (fileIndex === -1) {
+      return;
+    }
+    this.addedFiles.removeAt(fileIndex);
+  }
+
+  get addedFiles() {
+    return this.reviewForm.get('files') as FormArray;
   }
 
   onCancelClick(): void {

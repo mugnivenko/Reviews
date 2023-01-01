@@ -26,7 +26,7 @@ public class TagsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetTags([FromQuery] string? search)
     {
-        List<Tag> reviews = await _service.GetTags(search);
-        return Ok(_mapper.Map<List<TagDto>>(reviews));
+        List<Tag> tags = await _service.GetTags(search);
+        return Ok(_mapper.Map<List<TagDto>>(tags));
     }
 }

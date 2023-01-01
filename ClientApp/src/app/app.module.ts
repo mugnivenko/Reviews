@@ -11,6 +11,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 
+import { ToastrModule } from 'ngx-toastr';
+
 import { AppPaths } from 'src/app/shared/enums/app-paths.enum';
 
 import { AppComponent } from './app.component';
@@ -48,6 +50,7 @@ import { PersonalPageModule } from './personal-page/personal-page.module';
     ]),
     BrowserAnimationsModule,
     AngularSvgIconModule.forRoot(),
+    ToastrModule.forRoot(),
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthorizeInterceptor, multi: true },

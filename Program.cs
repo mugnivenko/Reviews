@@ -23,7 +23,8 @@ builder.Services.AddCors(corsOptions =>
                             .AllowCredentials());
 });
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString)
 );
@@ -75,6 +76,8 @@ builder.Services.AddScoped<ReviewService>();
 builder.Services.AddScoped<GroupService>();
 builder.Services.AddScoped<PieceService>();
 builder.Services.AddScoped<TagService>();
+builder.Services.AddScoped<ImageService>();
+builder.Services.AddScoped<StorageService>();
 
 builder.Services.AddAutoMapper(typeof(Program));
 
