@@ -19,7 +19,6 @@ import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 import { CounterComponent } from './counter/counter.component';
-import { FetchDataComponent } from './fetch-data/fetch-data.component';
 import { AuthorizeInterceptor } from './authorization/authorize.interceptor';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { HttpClientInterceptor } from './http-client.interceptor';
@@ -31,7 +30,6 @@ import { PersonalPageModule } from './personal-page/personal-page.module';
     NavMenuComponent,
     HomeComponent,
     CounterComponent,
-    FetchDataComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -46,7 +44,6 @@ import { PersonalPageModule } from './personal-page/personal-page.module';
     RouterModule.forRoot([
       { path: AppPaths.Home, component: HomeComponent, pathMatch: 'full' },
       { path: 'counter', component: CounterComponent },
-      { path: 'fetch-data', component: FetchDataComponent },
     ]),
     BrowserAnimationsModule,
     AngularSvgIconModule.forRoot(),

@@ -21,10 +21,6 @@ RUN dotnet publish -c release -o /app
 
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
-
-ARG LOCALE=
-
 WORKDIR /app
 COPY --from=build /app ./
-RUN cp -vra  /app/wwwroot/$LOCALE/. /app/wwwroot/
 ENTRYPOINT ["dotnet", "Reviews.dll"]

@@ -11,17 +11,12 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class HttpClientInterceptor implements HttpInterceptor {
-  baseUrl: string;
-  constructor(@Inject('BASE_URL') baseUrl: string) {
-    this.baseUrl = baseUrl;
-  }
-
   intercept(
     request: HttpRequest<unknown>,
     next: HttpHandler
   ): Observable<HttpEvent<unknown>> {
     const clonedRequest = request.clone({
-      url: `${this.baseUrl}api/${request.url}`,
+      url: `api/${request.url}`,
     });
 
     return next.handle(clonedRequest);
