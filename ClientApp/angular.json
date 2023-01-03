@@ -5,9 +5,13 @@
   "projects": {
     "Reviews": {
       "i18n": {
-        "sourceLocale": "en-US",
+        "sourceLocale": {
+          "code": "en-US",
+          "baseHref": ""
+        },
         "locales": {
           "ru": {
+            "baseHref": "",
             "translation": "src/locale/messages.ru.json"
           }
         }
@@ -80,6 +84,9 @@
             },
             "ru": {
               "localize": ["ru"]
+            },
+            "en-US": {
+              "localize": ["en-US"]
             }
           },
           "defaultConfiguration": "production"

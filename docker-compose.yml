@@ -2,11 +2,23 @@ version: "3.9"
 
 services:
   app:
-    build: .
+    build:
+      dockerfile: Dockerfile.enUS
     ports:
       - "5000:80/tcp"
     depends_on:
       - postgres
+    networks:
+      - reviews
+
+  app-ru:
+    build:
+      dockerfile: Dockerfile.ru
+    ports:
+      - "5001:80/tcp"
+    depends_on:
+      - postgres
+      - app
     networks:
       - reviews
 
@@ -16,7 +28,7 @@ services:
       - "5432"
     restart: always
     volumes:
-      - postgres_data:/var/lib/postgresql/postgres_data
+      - postgres_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=
       - POSTGRES_PASSWORD=
@@ -30,3 +42,4 @@ networks:
 
 volumes:
   postgres_data:
+    external: true
