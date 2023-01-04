@@ -1,4 +1,5 @@
+import type { Uuid } from "src/app/shared/models/uuid.model";
+
 export type ReviewDialogData = {
-  name: string;
-  animal: string;
+  creatorId: Uuid
 };

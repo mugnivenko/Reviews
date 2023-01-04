@@ -82,10 +82,6 @@ export class PersonalPageComponent implements OnInit {
   }
 
   getLanguage() {
-    this.languageService.getSelectedLanguage().subscribe((aaaaaaaa) => {
-      console.log(aaaaaaaa);
-    });
-
     this.language = this.languageService.getSelectedLanguage();
   }
 
@@ -161,7 +157,7 @@ export class PersonalPageComponent implements OnInit {
 
   handleAdd() {
     const dialogRef = this.dialog.open(CreateUpdateReviewModalComponent, {
-      data: { name: 'this.name', animal: 'this.animal' },
+      data: { creatorId: this.user?.id },
     });
 
     dialogRef.afterClosed().subscribe((result) => {

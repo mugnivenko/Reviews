@@ -129,5 +129,13 @@
 </mat-dialog-content>
 <div class="justify-end" mat-dialog-actions>
   <button mat-button (click)="onCancelClick()" i18n>Cancel</button>
-  <button mat-button (click)="onConfirmClick()" [disabled]="reviewForm.invalid" i18n>Create</button>
+  <button mat-button (click)="onConfirmClick()" [disabled]="reviewForm.invalid">
+    <mat-spinner *ngIf="saveReviewState === QueryState.Loading"
+                 class="save-button-loading"
+                 [diameter]="20">
+    </mat-spinner>
+    <p i18n class="save-button-text">
+      Create
+    </p>
+  </button>
 </div>

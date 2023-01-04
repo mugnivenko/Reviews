@@ -37,7 +37,7 @@ public class ImagesController : ControllerBase
     public async Task<IActionResult> SaveImage(IFormFile file)
     {
         _logger.LogInformation($"File received {file.FileName}");
-        Uri uri = await _service.SaveImage(file);
+        Uri uri = await _service.UploadImage(file);
         _logger.LogInformation($"Uri created {uri}");
         return Ok(new { uri });
     }

@@ -35,3 +35,14 @@
 .tags-spinner {
   height: 128px;
 }
+
+.save-button-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.save-button-text {
+  margin: 0;
+}

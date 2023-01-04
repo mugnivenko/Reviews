@@ -21,3 +21,14 @@ export type Review = {
   raitings: null;
   tags: null;
 };
+
+export type NewReview = {
+  name: string;
+  piece: string;
+  grade: number;
+  tags: string[];
+  content: string;
+  creatorId: Uuid;
+  groupId: Uuid;
+  files: string[];
+};

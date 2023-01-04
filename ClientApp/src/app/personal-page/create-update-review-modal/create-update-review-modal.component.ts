@@ -43,6 +43,7 @@ import { serializerCtx, Editor, editorViewCtx, rootCtx } from '@milkdown/core';
 import { TagService } from 'src/app/shared/services/tag.service';
 import { ThemeService } from 'src/app/theme/theme.service';
 import { GroupService } from 'src/app/shared/services/group.service';
+import { ReviewService } from 'src/app/shared/services/review.service';
 import { NotificationService } from 'src/app/notification/notification.service';
 
 import { QueryState } from 'src/app/shared/enums/query-state.enum';
@@ -50,6 +51,7 @@ import { Theme } from 'src/app/theme/shared/theme.enum';
 
 import type { Tag } from 'src/app/shared/models/tag.model';
 import type { Group } from 'src/app/shared/models/group.model';
+import type { NewReview } from 'src/app/shared/models/review.model';
 
 import type { ReviewDialogData } from '../shared/review-dailog-data.model';
 
@@ -64,16 +66,16 @@ export class CreateUpdateReviewModalComponent implements OnInit {
   @ViewChild('editorRef') editorRef?: ElementRef;
   editor?: Editor;
 
-  reviewForm = this.formBuilder.group({
+  reviewForm = this.formBuilder.nonNullable.group({
     name: ['', [Validators.required]],
-    group: ['', [Validators.required]],
+    groupId: ['', [Validators.required]],
     piece: ['', [Validators.required]],
     grade: [1],
-    tags: this.formBuilder.array<string[]>(
+    tags: this.formBuilder.nonNullable.array<string[]>(
       [],
       [Validators.required, Validators.minLength(1)]
     ),
-    files: this.formBuilder.array<string[]>(
+    files: this.formBuilder.nonNullable.array<string[]>(
       [],
       [Validators.required, Validators.minLength(1)]
     ),
@@ -91,6 +93,8 @@ export class CreateUpdateReviewModalComponent implements OnInit {
   options: UploaderOptions;
   files: UploadFile[] = [];
 
+  saveReviewState = QueryState.Idle;
+
   dragFilesHereOr = $localize`Drag files here or`;
   browse = $localize`browse`;
   toUpload = $localize`to upload.`;
@@ -102,7 +106,8 @@ export class CreateUpdateReviewModalComponent implements OnInit {
     private groupService: GroupService,
     private tagService: TagService,
     private themeService: ThemeService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private reviewService: ReviewService
   ) {
     this.options = {
       concurrency: 1,
@@ -164,12 +169,16 @@ export class CreateUpdateReviewModalComponent implements OnInit {
   }
 
   async groupChange(event: MatSelectChange) {
+    const groupId = await this.getGroupId(event.value);
+    this.reviewForm.get('groupId')?.setValue(groupId);
+  }
+
+  async getGroupId(gruopName: string) {
     if (this.groups === undefined) {
-      return;
+      return '';
     }
     const groups = await firstValueFrom(this.groups);
-    const groupId = groups.find(({ name }) => event.value === name)?.id ?? null;
-    this.reviewForm.get('group')?.setValue(groupId);
+    return groups.find(({ name }) => gruopName === name)?.id ?? '';
   }
 
   get addedTags() {
@@ -247,7 +256,6 @@ export class CreateUpdateReviewModalComponent implements OnInit {
         this.updateFile(output.file);
       },
       cancelled: (output: UploadOutput) => {
-        console.log('cancelled', { output });
         const { file } = output;
         if (file === undefined) return;
         this.notifyRemoveFile(file.id);
@@ -329,7 +337,20 @@ export class CreateUpdateReviewModalComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  onConfirmClick() {}
+  async onConfirmClick() {
+    const formValues = this.reviewForm.value as Required<
+      typeof this.reviewForm.value
+    >;
+    const review: NewReview = {
+      ...formValues,
+      content: this.getMarkdown() ?? '',
+      creatorId: this.data.creatorId,
+    };
+    this.reviewService
+      .createReview(review)
+      .pipe(untilDestroyed(this))
+      .subscribe();
+  }
 
   getGroups() {
     this.groups = this.groupService.getGroups();
