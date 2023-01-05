@@ -2,6 +2,8 @@ import type { TimeStamp } from './timestamp.model';
 import type { Uuid } from './uuid.model';
 import type { Group } from './group.model';
 import type { Piece } from './piece.model';
+import type { Tag } from './tag.model';
+import type { Image } from './image.model';
 
 export type Review = {
   commentaries: null;
@@ -13,16 +15,16 @@ export type Review = {
   group: Group;
   groupId: Uuid;
   id: Uuid;
-  images: null;
+  images: Image[];
   likes: null;
   name: string;
   piece: Piece;
   pieceId: Uuid;
   raitings: null;
-  tags: null;
+  tags: Tag[];
 };
 
-export type NewReview = {
+export type SavingReview = {
   name: string;
   piece: string;
   grade: number;

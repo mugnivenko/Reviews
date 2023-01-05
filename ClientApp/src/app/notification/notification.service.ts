@@ -16,4 +16,8 @@ export class NotificationService {
   public error({ message, description }: Partial<NotificationData>) {
     this.toastr.error(description, message);
   }
+
+  public success({ message, description }: Partial<NotificationData>) {
+    this.toastr.success(description, message);
+  }
 }

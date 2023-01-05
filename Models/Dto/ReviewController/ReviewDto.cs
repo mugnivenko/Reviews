@@ -19,5 +19,11 @@ public class ReviewDto
     public Guid PieceId { get; set; }
 
     public GroupDto Group { get; set; } = default!;
+
     public PieceDto Piece { get; set; } = default!;
+
+    public IEnumerable<TagDto> Tags { get; set; } = default!;
+
+    public IEnumerable<ImageDto> Images { get; set; } = default!;
+
 }

@@ -2,6 +2,7 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  HostListener,
   Inject,
   OnInit,
   ViewChild,
@@ -38,7 +39,13 @@ import { nord } from '@milkdown/theme-nord';
 import { tokyo } from '@milkdown/theme-tokyo';
 import { slash } from '@milkdown/plugin-slash';
 import { commonmark } from '@milkdown/preset-commonmark';
-import { serializerCtx, Editor, editorViewCtx, rootCtx } from '@milkdown/core';
+import {
+  serializerCtx,
+  Editor,
+  editorViewCtx,
+  rootCtx,
+  defaultValueCtx,
+} from '@milkdown/core';
 
 import { TagService } from 'src/app/shared/services/tag.service';
 import { ThemeService } from 'src/app/theme/theme.service';
@@ -51,9 +58,18 @@ import { Theme } from 'src/app/theme/shared/theme.enum';
 
 import type { Tag } from 'src/app/shared/models/tag.model';
 import type { Group } from 'src/app/shared/models/group.model';
-import type { NewReview } from 'src/app/shared/models/review.model';
+import type { SavingReview } from 'src/app/shared/models/review.model';
 
 import type { ReviewDialogData } from '../shared/review-dailog-data.model';
+
+type FormValues = {
+  name: string;
+  group: string;
+  piece: string;
+  grade: number;
+  tags: string[];
+  files: string[];
+};
 
 @UntilDestroy()
 @Component({
@@ -67,16 +83,19 @@ export class CreateUpdateReviewModalComponent implements OnInit {
   editor?: Editor;
 
   reviewForm = this.formBuilder.nonNullable.group({
-    name: ['', [Validators.required]],
-    groupId: ['', [Validators.required]],
-    piece: ['', [Validators.required]],
-    grade: [1],
-    tags: this.formBuilder.nonNullable.array<string[]>(
-      [],
+    name: [this.data.name ?? '', [Validators.required]],
+    group: [this.data.group?.name ?? '', [Validators.required]],
+    piece: [this.data.piece?.name ?? '', [Validators.required]],
+    grade: [this.data.grade ?? 1],
+    tags: this.formBuilder.nonNullable.array(
+      [...(this.data.tags?.map((tag) => new FormControl(tag.name)) ?? [])],
       [Validators.required, Validators.minLength(1)]
     ),
-    files: this.formBuilder.nonNullable.array<string[]>(
-      [],
+    files: this.formBuilder.nonNullable.array(
+      [
+        ...(this.data.images?.map((image) => new FormControl(image.link)) ??
+          []),
+      ],
       [Validators.required, Validators.minLength(1)]
     ),
   });
@@ -93,11 +112,20 @@ export class CreateUpdateReviewModalComponent implements OnInit {
   options: UploaderOptions;
   files: UploadFile[] = [];
 
+  isEdit = this.data.id !== undefined;
+
   saveReviewState = QueryState.Idle;
 
   dragFilesHereOr = $localize`Drag files here or`;
   browse = $localize`browse`;
   toUpload = $localize`to upload.`;
+
+  @HostListener('window:keyup.Enter', ['$event'])
+  onDialogClick(event: KeyboardEvent) {
+    if (!this.reviewForm.invalid && !(this.isEdit && !this.reviewForm.dirty)) {
+      this.onConfirmClick();
+    }
+  }
 
   constructor(
     private dialogRef: MatDialogRef<CreateUpdateReviewModalComponent>,
@@ -142,6 +170,7 @@ export class CreateUpdateReviewModalComponent implements OnInit {
     this.editor = await Editor.make()
       .config((ctx) => {
         ctx.set(rootCtx, this.editorRef?.nativeElement);
+        ctx.set(defaultValueCtx, this.data.content ?? '');
       })
       .use(theme)
       .use(commonmark)
@@ -169,8 +198,7 @@ export class CreateUpdateReviewModalComponent implements OnInit {
   }
 
   async groupChange(event: MatSelectChange) {
-    const groupId = await this.getGroupId(event.value);
-    this.reviewForm.get('groupId')?.setValue(groupId);
+    this.reviewForm.get('group')?.setValue(event.value);
   }
 
   async getGroupId(gruopName: string) {
@@ -205,8 +233,9 @@ export class CreateUpdateReviewModalComponent implements OnInit {
     chipInput.clear();
   }
 
-  selectedTag({ option }: MatAutocompleteSelectedEvent) {
+  selectTag({ option }: MatAutocompleteSelectedEvent) {
     this.addTagInForm(option.value);
+    this.tagsInput.setValue(null);
   }
 
   get selectedTags() {
@@ -215,6 +244,7 @@ export class CreateUpdateReviewModalComponent implements OnInit {
 
   addTagInForm(value: string) {
     this.selectedTags.push(new FormControl(value));
+    this.makeTagsAsDirty();
   }
 
   removeTag(tag: string) {
@@ -223,6 +253,11 @@ export class CreateUpdateReviewModalComponent implements OnInit {
     );
     if (tagIndex === -1) return;
     this.selectedTags.removeAt(tagIndex);
+    this.makeTagsAsDirty();
+  }
+
+  makeTagsAsDirty() {
+    this.reviewForm.get('tags')?.markAsDirty();
   }
 
   uploadActions: Record<UploadOutput['type'], (output: UploadOutput) => void> =
@@ -267,6 +302,7 @@ export class CreateUpdateReviewModalComponent implements OnInit {
           return;
         }
         this.addedFiles.push(new FormControl(uri));
+        this.makeFilesAsDirty();
       },
       removed: (output: UploadOutput) => {
         this.files = this.files.filter((file) => file.id !== output.file?.id);
@@ -308,8 +344,9 @@ export class CreateUpdateReviewModalComponent implements OnInit {
     action(output);
   }
 
-  onFileDelete(id: string) {
-    this.notifyRemoveFile(id);
+  onFileDelete(file: Nullable<string>) {
+    if (file === null) return;
+    this.removeFileFromForm(file);
   }
 
   onFileCancel(id: string) {
@@ -317,20 +354,21 @@ export class CreateUpdateReviewModalComponent implements OnInit {
   }
 
   removeFileFromForm(uri: unknown) {
-    if (typeof uri !== 'string') {
-      return;
-    }
+    if (typeof uri !== 'string') return;
     const fileIndex = this.addedFiles.value.findIndex(
       (addedUri: string) => addedUri === uri
     );
-    if (fileIndex === -1) {
-      return;
-    }
+    if (fileIndex === -1) return;
     this.addedFiles.removeAt(fileIndex);
+    this.makeFilesAsDirty();
   }
 
   get addedFiles() {
     return this.reviewForm.get('files') as FormArray;
+  }
+
+  makeFilesAsDirty() {
+    this.reviewForm.get('files')?.markAsDirty();
   }
 
   onCancelClick(): void {
@@ -338,18 +376,59 @@ export class CreateUpdateReviewModalComponent implements OnInit {
   }
 
   async onConfirmClick() {
+    if (this.isEdit) {
+      this.updateReview();
+      return;
+    }
+    this.saveNewReview();
+  }
+
+  async saveNewReview() {
     const formValues = this.reviewForm.value as Required<
       typeof this.reviewForm.value
     >;
-    const review: NewReview = {
+    const groupId = await this.getGroupId(formValues.group);
+    const review: SavingReview = {
       ...formValues,
       content: this.getMarkdown() ?? '',
       creatorId: this.data.creatorId,
+      files: formValues.files.map((file) => String(file)),
+      tags: formValues.tags.map((tag) => String(tag)),
+      groupId,
     };
+    this.saveReviewState = QueryState.Loading;
     this.reviewService
-      .createReview(review)
+      .create(review)
       .pipe(untilDestroyed(this))
-      .subscribe();
+      .subscribe((review) => {
+        this.saveReviewState = QueryState.Success;
+        this.dialogRef.close(review);
+      });
+  }
+
+  updateReview() {
+    const changedValues = this.getChangedFormValues();
+    const { id } = this.data;
+    if (id === undefined) return;
+    this.saveReviewState = QueryState.Loading;
+    this.reviewService
+      .update(id, changedValues)
+      .pipe(untilDestroyed(this))
+      .subscribe((review) => {
+        this.saveReviewState = QueryState.Success;
+        this.dialogRef.close(review);
+      });
+  }
+
+  getChangedFormValues() {
+    return Object.entries(this.reviewForm.controls).reduce<
+      Record<string, string | number | (string | null)[]>
+    >((acc, [controlName, control]) => {
+      if (control.dirty) {
+        acc[controlName] = control.value;
+      }
+      return acc;
+    }, {});
   }
 
   getGroups() {

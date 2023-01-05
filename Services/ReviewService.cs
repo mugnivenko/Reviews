@@ -40,11 +40,8 @@ public class ReviewService
             );
         AddSort(ref query, sortFilterReview);
         AddFilter(ref query, sortFilterReview);
-        return await query
-            .Include(review => review.Group)
-            .Include(review => review.Piece)
-            .AsSplitQuery()
-            .ToListAsync();
+        await UncludeRelativeData(query);
+        return await query.ToListAsync();
     }
 
     private void AddSort(ref IQueryable<Review> query, SortFilterReviewDto sortFilterReview)
@@ -70,13 +67,19 @@ public class ReviewService
         };
     }
 
-    public async Task<Review> GetReviewWithGroupAndPiece(Guid reviewId)
+    public async Task<Review> GetReview(Guid reviewId)
     {
-        return await _context.Reviews
-            .Where(review => review.Id == reviewId)
-            .Include(review => review.Group)
-            .Include(review => review.Piece)
-            .SingleAsync();
+        IQueryable<Review> query = _context.Reviews.Where(review => review.Id == reviewId);
+        await UncludeRelativeData(query);
+        return await query.SingleAsync();
+    }
+
+    private async Task UncludeRelativeData(IQueryable<Review> query)
+    {
+        await query.Include(review => review.Group).LoadAsync();
+        await query.Include(review => review.Piece).LoadAsync();
+        await query.Include(review => review.Tags).LoadAsync();
+        await query.Include(review => review.Images).LoadAsync();
     }
 
     public async Task<Review> CreateReviewWithRelativeData(CreatingReviewDto creatingReview)
@@ -106,7 +109,7 @@ public class ReviewService
         return review;
     }
 
-    public async Task UpdateReview(Guid id, EditingReviewDto editingReview)
+    public async Task<Review> UpdateReview(Guid id, EditingReviewDto editingReview)
     {
 
         Review review = await _context.Reviews.Where(review => review.Id == id).SingleAsync();
@@ -119,6 +122,7 @@ public class ReviewService
             _ => review,
         };
         await _context.SaveChangesAsync();
+        return review;
     }
 
     private async Task<Review> UpdateReviewPiece(string pieceName, Review review)
@@ -196,5 +200,10 @@ public class ReviewService
             .Where(review => review.Id == reviewId)
             .Include(review => review.Images)
             .SingleAsync();
+    }
+
+    public async Task DeleteReview(Guid id)
+    {
+        await _context.Reviews.Where(review => review.Id == id).ExecuteDeleteAsync();
     }
 }

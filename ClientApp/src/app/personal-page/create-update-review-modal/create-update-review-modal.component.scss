@@ -1,3 +1,7 @@
+.editor{
+  width: 75vw;
+}
+
 .upload-box-content {
   .upload-item, .drop-container {
     box-shadow:
@@ -45,4 +49,8 @@
 
 .save-button-text {
   margin: 0;
+}
+
+.delete-image-button {
+  position: absolute;
 }

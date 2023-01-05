@@ -5,6 +5,7 @@ import {
   catchError,
   combineLatestWith,
   firstValueFrom,
+  of,
   startWith,
   tap,
   throwError,
@@ -161,7 +162,11 @@ export class PersonalPageComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      console.log('The dialog was closed', result);
+      if (result === undefined) return;
+      if (this.reviews === undefined) return;
+      firstValueFrom(this.reviews).then((reviews) => {
+        this.reviews = of(reviews);
+      });
     });
   }
 

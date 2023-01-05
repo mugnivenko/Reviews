@@ -36,7 +36,7 @@ public class ReviewsController : ControllerBase
     public async Task<IActionResult> CreateReview([FromBody] CreatingReviewDto savingReview)
     {
         Review createdReview = await _service.CreateReviewWithRelativeData(savingReview);
-        Review review = await _service.GetReviewWithGroupAndPiece(createdReview.Id);
+        Review review = await _service.GetReview(createdReview.Id);
         return Ok(_mapper.Map<ReviewDto>(review));
     }
 
@@ -44,7 +44,15 @@ public class ReviewsController : ControllerBase
     [HttpPatch("{id}")]
     public async Task<IActionResult> EditReview(Guid id, [FromBody] EditingReviewDto editingReview)
     {
-        await _service.UpdateReview(id, editingReview);
-        return Ok();
+        Review updatedReview = await _service.UpdateReview(id, editingReview);
+        Review review = await _service.GetReview(updatedReview.Id);
+        return Ok(_mapper.Map<ReviewDto>(review));
+    }
+
+    [Authorize]
+    [HttpDelete("{id}")]
+    public async Task DeleteReview(Guid id)
+    {
+        await _service.DeleteReview(id);
     }
 }

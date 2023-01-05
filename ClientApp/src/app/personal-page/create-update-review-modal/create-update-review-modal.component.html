@@ -1,4 +1,4 @@
-<h1 mat-dialog-title i18n>New review</h1>
+<h1 mat-dialog-title i18n>{{ isEdit ? "Edit Review" : "New review" }}</h1>
 <mat-dialog-content>
     <form [formGroup]="reviewForm" class="w-100">
       <mat-form-field class="w-full" appearance="fill">
@@ -10,7 +10,7 @@
       </mat-form-field>
       <mat-form-field class="w-full" appearance="fill">
         <mat-label i18n>Group</mat-label>
-        <mat-select (selectionChange)="groupChange($event)">
+        <mat-select formControlName="group" (selectionChange)="groupChange($event)">
           <mat-option *ngFor="let group of groups | async" [value]="group.name">
             {{ group.name }}
           </mat-option>
@@ -23,7 +23,7 @@
                i18n-placeholder
                placeholder="Enter piece">
       </mat-form-field>
-      <div class="pb-3" #editorRef></div>
+      <div class="pb-3 editor" #editorRef></div>
       <mat-form-field class="w-full" appearance="fill">
         <mat-label i18n>Grade</mat-label>
         <input matInput
@@ -55,7 +55,7 @@
             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
             (matChipInputTokenEnd)="addTag($event)">
         </mat-chip-list>
-        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedTag($event)">
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectTag($event)">
           <mat-option [class.hidden]="tagsState === QueryState.Loading"
                       *ngFor="let tag of tags | async"
                       [value]="tag.name">
@@ -72,7 +72,7 @@
       </mat-form-field>
     </form>
     <div class="upload-box-content"
-         [class.hidden]="files.length !== 0">
+         [class.hidden]="reviewForm.value.files?.length !== 0">
       <div
         class="drop-container flex justify-center items-center w-full h-36"
         ngFileDrop
@@ -97,45 +97,57 @@
         </p>
       </div>
     </div>
-    <div class="flex flex-col" *ngFor="let file of files">
-      <div class="flex items-center gap-2 p-2">
-        <ng-container
-          *ngTemplateOutlet="fileInfo; context: {'$implicit': file.progress.status }">  
-        </ng-container>
-        <ng-template #fileInfo let-status>
-          <mat-spinner *ngIf="status === UploadStatus.Uploading" [diameter]="20"></mat-spinner>
-          <div [ngClass]="{ 'w-full': status === UploadStatus.Done, 'w-11/12': status === UploadStatus.Uploading }"
-               class="flex flex-col">
-            <span class="mat-body pb-2">{{ file.name }}</span>  
-            <mat-progress-bar mode="determinate"
-                              [value]="file.progress.data?.percentage">
-            </mat-progress-bar>
-          </div>
-          <button (click)="onFileDelete(file.id)"
-                  *ngIf="status === UploadStatus.Done"
-                  mat-icon-button
-                  color="primary">
-            <mat-icon>delete</mat-icon>
-          </button>
-          <button (click)="onFileCancel(file.id)"
-                  *ngIf="status === UploadStatus.Uploading"
-                  mat-icon-button
-                  color="primary">
-            <mat-icon>cancel</mat-icon>
-          </button>
-        </ng-template>
+    <ng-container *ngIf="reviewForm.value.files?.length === 0">
+      <div class="flex flex-col" *ngFor="let file of files">
+        <div class="flex items-center gap-2 p-2">
+          <ng-container
+            *ngTemplateOutlet="fileInfo; context: {'$implicit': file.progress.status }">  
+          </ng-container>
+          <ng-template #fileInfo let-status>
+            <mat-spinner *ngIf="status === UploadStatus.Uploading" [diameter]="20"></mat-spinner>
+            <div [ngClass]="{ 'w-11/12': status === UploadStatus.Uploading }"
+                 class="flex flex-col">
+              <span class="mat-body pb-2">{{ file.name }}</span>  
+              <mat-progress-bar mode="determinate"
+                                [value]="file.progress.data?.percentage">
+              </mat-progress-bar>
+            </div>
+            <button (click)="onFileCancel(file.id)"
+                    *ngIf="status === UploadStatus.Uploading"
+                    mat-icon-button
+                    color="primary">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </ng-template>
+        </div>
       </div>
-    </div>
+    </ng-container>
+    <ng-container *ngIf="reviewForm.value.files?.length !== 0">
+      <div class="relative w-1/6" *ngFor="let file of reviewForm.value.files">
+        <picture>
+          <source [srcset]="file">
+          <img [src]="file" alt="image">
+        </picture>
+        <button mat-icon-button
+                color="primary" 
+                class="delete-image-button top-0 right-0"
+                (click)="onFileDelete(file)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </ng-container>
 </mat-dialog-content>
 <div class="justify-end" mat-dialog-actions>
   <button mat-button (click)="onCancelClick()" i18n>Cancel</button>
-  <button mat-button (click)="onConfirmClick()" [disabled]="reviewForm.invalid">
+  <button mat-button
+          (click)="onConfirmClick()"
+          [disabled]="reviewForm.invalid || isEdit && !reviewForm.dirty || saveReviewState === QueryState.Loading">
     <mat-spinner *ngIf="saveReviewState === QueryState.Loading"
                  class="save-button-loading"
                  [diameter]="20">
     </mat-spinner>
     <p i18n class="save-button-text">
-      Create
+      {{ isEdit ?  "Save" : "Create"  }}
     </p>
   </button>
 </div>

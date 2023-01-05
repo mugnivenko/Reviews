@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import type { HttpParams } from '@angular/common/http';
 
 import type { Uuid } from '../models/uuid.model';
-import type { Review, NewReview } from '../models/review.model';
+import type { Review, SavingReview } from '../models/review.model';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +15,15 @@ export class ReviewService {
     return this.httpClient.get<Review[]>(`reviews/users/${id}`, { params });
   }
 
-  public createReview(review: NewReview) {
+  public create(review: SavingReview) {
     return this.httpClient.post<Review[]>(`reviews`, review);
+  }
+
+  public update(id: Uuid, review: Partial<SavingReview>) {
+    return this.httpClient.patch<Review[]>(`reviews/${id}`, review);
+  }
+
+  public delete(id: Uuid) {
+    return this.httpClient.delete(`reviews/${id}`);
   }
 }
