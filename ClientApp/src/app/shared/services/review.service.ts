@@ -11,6 +11,12 @@ import type { Review, SavingReview } from '../models/review.model';
 export class ReviewService {
   constructor(private httpClient: HttpClient) {}
 
+  public getReviews(id?: Uuid) {
+    return this.httpClient.get<Review[]>(`reviews`, {
+      params: { userId: id ?? '' },
+    });
+  }
+
   public getUserReviews(id: Uuid, params: HttpParams) {
     return this.httpClient.get<Review[]>(`reviews/users/${id}`, { params });
   }

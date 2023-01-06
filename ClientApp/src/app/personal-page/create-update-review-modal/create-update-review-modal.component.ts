@@ -46,6 +46,7 @@ import {
   rootCtx,
   defaultValueCtx,
 } from '@milkdown/core';
+import { listener, listenerCtx } from '@milkdown/plugin-listener';
 
 import { TagService } from 'src/app/shared/services/tag.service';
 import { ThemeService } from 'src/app/theme/theme.service';
@@ -61,15 +62,6 @@ import type { Group } from 'src/app/shared/models/group.model';
 import type { SavingReview } from 'src/app/shared/models/review.model';
 
 import type { ReviewDialogData } from '../shared/review-dailog-data.model';
-
-type FormValues = {
-  name: string;
-  group: string;
-  piece: string;
-  grade: number;
-  tags: string[];
-  files: string[];
-};
 
 @UntilDestroy()
 @Component({
@@ -87,6 +79,7 @@ export class CreateUpdateReviewModalComponent implements OnInit {
     group: [this.data.group?.name ?? '', [Validators.required]],
     piece: [this.data.piece?.name ?? '', [Validators.required]],
     grade: [this.data.grade ?? 1],
+    content: ['', [Validators.required]],
     tags: this.formBuilder.nonNullable.array(
       [...(this.data.tags?.map((tag) => new FormControl(tag.name)) ?? [])],
       [Validators.required, Validators.minLength(1)]
@@ -120,12 +113,12 @@ export class CreateUpdateReviewModalComponent implements OnInit {
   browse = $localize`browse`;
   toUpload = $localize`to upload.`;
 
-  @HostListener('window:keyup.Enter', ['$event'])
-  onDialogClick(event: KeyboardEvent) {
-    if (!this.reviewForm.invalid && !(this.isEdit && !this.reviewForm.dirty)) {
-      this.onConfirmClick();
-    }
-  }
+  // @HostListener('window:keyup.Enter', ['$event'])
+  // onDialogClick(event: KeyboardEvent) {
+  //   if (!this.reviewForm.invalid && !(this.isEdit && !this.reviewForm.dirty)) {
+  //     this.onConfirmClick();
+  //   }
+  // }
 
   constructor(
     private dialogRef: MatDialogRef<CreateUpdateReviewModalComponent>,
@@ -171,12 +164,17 @@ export class CreateUpdateReviewModalComponent implements OnInit {
       .config((ctx) => {
         ctx.set(rootCtx, this.editorRef?.nativeElement);
         ctx.set(defaultValueCtx, this.data.content ?? '');
+        ctx.get(listenerCtx).markdownUpdated((_, markdown) => {
+          this.reviewForm.get('content')?.setValue(markdown);
+          this.reviewForm.get('content')?.markAsDirty();
+        });
       })
       .use(theme)
       .use(commonmark)
       .use(slash)
       .use(menu)
       .use(gfm)
+      .use(listener)
       .create();
   }
 
@@ -187,14 +185,6 @@ export class CreateUpdateReviewModalComponent implements OnInit {
       [Theme.Light]: nord,
     };
     return editorTheme[theme];
-  }
-
-  getMarkdown() {
-    return this.editor?.action((ctx) => {
-      const editorView = ctx.get(editorViewCtx);
-      const serializer = ctx.get(serializerCtx);
-      return serializer(editorView.state.doc);
-    });
   }
 
   async groupChange(event: MatSelectChange) {
@@ -390,7 +380,6 @@ export class CreateUpdateReviewModalComponent implements OnInit {
     const groupId = await this.getGroupId(formValues.group);
     const review: SavingReview = {
       ...formValues,
-      content: this.getMarkdown() ?? '',
       creatorId: this.data.creatorId,
       files: formValues.files.map((file) => String(file)),
       tags: formValues.tags.map((tag) => String(tag)),

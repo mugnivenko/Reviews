@@ -50,7 +50,7 @@
               "src/theme.scss",
               "node_modules/ngx-toastr/toastr.css"
             ],
-            "scripts": []
+            "scripts": ["node_modules/marked/marked.min.js"]
           },
           "configurations": {
             "production": {
@@ -123,7 +123,7 @@
               "src/theme.scss",
               "node_modules/ngx-toastr/toastr.css"
             ],
-            "scripts": []
+            "scripts": ["node_modules/marked/marked.min.js"]
           }
         },
         "server": {

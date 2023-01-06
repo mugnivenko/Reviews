@@ -78,6 +78,7 @@ builder.Services.AddScoped<PieceService>();
 builder.Services.AddScoped<TagService>();
 builder.Services.AddScoped<ImageService>();
 builder.Services.AddScoped<StorageService>();
+builder.Services.AddScoped<LikesService>();
 
 builder.Services.AddAutoMapper(typeof(Program));
 

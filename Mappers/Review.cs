@@ -12,9 +12,17 @@ public class ReviewProfile : Profile
         CreateMap<Review, ReviewDto>();
 
         CreateMap<EditingReviewDto, Review>()
-            .ForMember(Ignore => Ignore.Tags, memberOptions => memberOptions.Ignore())
-            .ForMember(Ignore => Ignore.Piece, memberOptions => memberOptions.Ignore())
+            .ForMember(review => review.Tags, memberOptions => memberOptions.Ignore())
+            .ForMember(review => review.Piece, memberOptions => memberOptions.Ignore())
             .ForAllMembers(memberOptions => memberOptions.Condition(FilterNullableValues));
+
+        CreateMap<Review, FullReviewDto>()
+            .ForMember(
+                destinationMember => destinationMember.Like,
+                memberOptions => memberOptions.MapFrom(
+                    memberOptions => memberOptions.Likes.FirstOrDefault()
+                )
+            );
     }
 
     private bool FilterNullableValues(EditingReviewDto source, Review destinatiom, object sourceMember)

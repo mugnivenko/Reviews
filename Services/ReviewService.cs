@@ -30,6 +30,21 @@ public class ReviewService
         _mapper = mapper;
     }
 
+    public async Task<List<Review>> GetReviews(Guid? userId)
+    {
+        IQueryable<Review> query = _context.Reviews;
+        await query.Include(review => review.Creator).LoadAsync();
+        await query.Include(review => review.Group).LoadAsync();
+        await query.Include(review => review.Images).LoadAsync();
+        await query.Include(review => review.Tags).LoadAsync();
+        await query.Include(review => review.Piece).LoadAsync();
+        if (userId != Guid.Empty)
+        {
+            await query.Include(review => review.Likes.Where(like => like.UserId.Equals(userId))).LoadAsync();
+        }
+        return await query.ToListAsync();
+    }
+
     public async Task<List<Review>> GetUserReviews(Guid userId, SortFilterReviewDto sortFilterReview)
     {
         var query = _context.Reviews

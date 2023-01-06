@@ -9,14 +9,14 @@ export type Review = {
   commentaries: null;
   content: string;
   createdAt: TimeStamp;
-  creator: null;
+  creator: { id: Uuid; userName: string };
   creatorId: Uuid;
   grade: number;
   group: Group;
   groupId: Uuid;
   id: Uuid;
   images: Image[];
-  likes: null;
+  like: Nullable<{ id: Uuid }>;
   name: string;
   piece: Piece;
   pieceId: Uuid;

@@ -13,6 +13,8 @@ import { AngularSvgIconModule } from 'angular-svg-icon';
 
 import { ToastrModule } from 'ngx-toastr';
 
+import { MarkdownModule, MarkedOptions } from 'ngx-markdown';
+
 import { AppPaths } from 'src/app/shared/enums/app-paths.enum';
 
 import { AppComponent } from './app.component';
@@ -23,16 +25,15 @@ import { AuthorizeInterceptor } from './authorization/authorize.interceptor';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { HttpClientInterceptor } from './http-client.interceptor';
 import { PersonalPageModule } from './personal-page/personal-page.module';
+import { HomeModule } from './home/home.module';
+import { ReviewPageModule } from './review-page/review-page.module';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    NavMenuComponent,
-    HomeComponent,
-    CounterComponent,
-  ],
+  declarations: [AppComponent, NavMenuComponent, CounterComponent],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
+    HomeModule,
+    ReviewPageModule,
     HttpClientModule,
     FormsModule,
     AuthorizationModule,
@@ -48,6 +49,14 @@ import { PersonalPageModule } from './personal-page/personal-page.module';
     BrowserAnimationsModule,
     AngularSvgIconModule.forRoot(),
     ToastrModule.forRoot(),
+    MarkdownModule.forRoot({
+      markedOptions: {
+        provide: MarkedOptions,
+        useValue: {
+          gfm: true,
+        },
+      },
+    }),
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthorizeInterceptor, multi: true },
