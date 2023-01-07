@@ -8,6 +8,10 @@ public class Commentary : BaseModel
     [Required]
     public string Content { get; set; } = default!;
 
+
+    [DataType(DataType.DateTime)]
+    public DateTime CreatedAt { get; set; }
+
     public Guid ReviewId { get; set; }
     public virtual Review Review { get; set; } = default!;
 

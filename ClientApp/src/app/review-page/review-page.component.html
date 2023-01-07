@@ -1,1 +1,35 @@
-<p>review-page works!</p>
+<div class="flex justify-center" >
+  <mat-spinner *ngIf="commentariesState === QueryState.Loading">
+  </mat-spinner>
+</div>
+
+<div class="flex flex-col">
+  <div class="border-solid border-2 border-gray-500 p-4 mt-2 rounded-3xl"
+       *ngFor="let commentary of commentaries">
+    <div class="flex divide-x divide-solid gap-2">
+        <p class="text-xs">{{ commentary.creator.userName }}</p>
+        <p class="text-xs pl-2">{{ commentary.createdAt | date: 'MMM d, y, h:mm a' }}</p>
+    </div>
+    <div>
+      <pre class="text-base">{{ commentary.content }}</pre>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="isAuthorized" class="flex items-center justify-center gap-2 mt-4">
+  <mat-form-field class="w-3/5">
+    <mat-label i18n>Leave a comment</mat-label>
+    <textarea matInput [formControl]="commentaryControl"></textarea>
+  </mat-form-field>
+  <button class="h-fit"
+          mat-raised-button
+          [disabled]="commentaryControl.invalid || commentarySavingState === QueryState.Loading"
+          (click)="onSaveCommentClick()"
+          color="primary">
+    <mat-spinner *ngIf="commentarySavingState === QueryState.Loading"
+                 class="save-comment-loading"
+                 [diameter]="20">
+    </mat-spinner>
+    <p>Comment</p>
+  </button>
+</div>

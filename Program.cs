@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
+using Reviews.Hubs;
 using Reviews.Data;
 using Reviews.Models;
 using Reviews.Services;
@@ -12,15 +13,17 @@ using Reviews.Services;
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
+builder.Services.AddSignalR();
+
 builder.Services.AddCors(corsOptions =>
 {
     corsOptions.AddPolicy(
-        "fully permissive",
+        "CorsPolicy",
         configurePolicy => configurePolicy
-                            .AllowAnyHeader()
-                            .AllowAnyMethod()
-                            .AllowAnyOrigin()
-                            .AllowCredentials());
+            .WithOrigins("http://localhost:44449")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials());
 });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
@@ -79,12 +82,17 @@ builder.Services.AddScoped<TagService>();
 builder.Services.AddScoped<ImageService>();
 builder.Services.AddScoped<StorageService>();
 builder.Services.AddScoped<LikesService>();
+builder.Services.AddScoped<CommentaryService>();
 
 builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
+
+app.UseWebSockets();
+
+app.UseCors("CorsPolicy");
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -108,6 +116,8 @@ app.MapControllerRoute(
     pattern: "{controller}/{action=Index}/{id?}");
 
 app.MapFallbackToFile("index.html");
+
+app.MapHub<CommentariesHub>("/hub/commentaries");
 
 using (var scope = app.Services.CreateScope())
 {
