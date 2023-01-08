@@ -43,5 +43,13 @@ public class ReviewEntityTypeConfiguration : IEntityTypeConfiguration<Review>
         builder
             .HasMany(navigationExpression => navigationExpression.Likes)
             .WithOne(navigationExpression => navigationExpression.Review);
+
+        builder
+            .HasGeneratedTsVectorColumn(
+                p => p.SearchVector,
+                "simple",
+                p => new { p.Name, p.Content })
+            .HasIndex(p => p.SearchVector)
+            .HasMethod("GIN");
     }
 }

@@ -4,6 +4,7 @@ import {
   HttpHandler,
   HttpEvent,
   HttpInterceptor,
+  HttpStatusCode,
 } from '@angular/common/http';
 import { Router } from '@angular/router';
 
@@ -38,7 +39,7 @@ export class AuthorizeInterceptor implements HttpInterceptor {
 
     return next.handle(clonedRequest).pipe(
       catchError((err) => {
-        if (err.status === 401) {
+        if (err.status === HttpStatusCode.Unauthorized) {
           this.authorizeService.logout();
           this.router.navigate(['/login']);
         }

@@ -23,6 +23,8 @@ public class ReviewProfile : Profile
                     memberOptions => memberOptions.Likes.FirstOrDefault()
                 )
             );
+
+        CreateMap<Review, SearchReview>();
     }
 
     private bool FilterNullableValues(EditingReviewDto source, Review destinatiom, object sourceMember)

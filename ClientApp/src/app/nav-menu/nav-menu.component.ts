@@ -2,11 +2,15 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { Observable, Subject, map, takeUntil } from 'rxjs';
 
+import { MatDialog } from '@angular/material/dialog';
+
 import { ThemeService } from 'src/app/theme/theme.service';
 import { AuthorizeService } from 'src/app/authorization/authorize.service';
 
 import { Theme } from 'src/app/theme/shared/theme.enum';
 import type { Uuid } from 'src/app/shared/models/uuid.model';
+
+import { ReviewSearchComponent } from 'src/app/review-search/review-search.component';
 
 @Component({
   selector: 'app-nav-menu',
@@ -23,7 +27,8 @@ export class NavMenuComponent implements OnInit, OnDestroy {
 
   constructor(
     private authorizeService: AuthorizeService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -48,6 +53,10 @@ export class NavMenuComponent implements OnInit, OnDestroy {
 
   logout() {
     this.authorizeService.logout();
+  }
+
+  reviewSearch() {
+    this.dialog.open(ReviewSearchComponent);
   }
 
   ngOnDestroy() {

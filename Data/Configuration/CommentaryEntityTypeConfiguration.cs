@@ -18,5 +18,13 @@ public class CommentaryEntityTypeConfiguration : IEntityTypeConfiguration<Commen
             .HasOne(navigationExpression => navigationExpression.Review)
             .WithMany(navigationExpression => navigationExpression.Commentaries)
             .HasForeignKey(foreignKeyExpression => foreignKeyExpression.ReviewId);
+
+        builder
+            .HasGeneratedTsVectorColumn(
+                p => p.SearchVector,
+                "simple",
+                p => new { p.Content })
+            .HasIndex(p => p.SearchVector)
+            .HasMethod("GIN");
     }
 }

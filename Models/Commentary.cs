@@ -1,5 +1,5 @@
+using NpgsqlTypes;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Reviews.Models;
 
@@ -17,4 +17,6 @@ public class Commentary : BaseModel
 
     public Guid CreatorId { get; set; }
     public virtual ApplicationUser Creator { get; set; } = default!;
+
+    public NpgsqlTsVector SearchVector { get; set; } = default!;
 }

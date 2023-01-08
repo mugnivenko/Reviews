@@ -27,6 +27,7 @@ import { HttpClientInterceptor } from './http-client.interceptor';
 import { PersonalPageModule } from './personal-page/personal-page.module';
 import { HomeModule } from './home/home.module';
 import { ReviewPageModule } from './review-page/review-page.module';
+import { ReviewSearchModule } from './review-search/review-search.module';
 
 @NgModule({
   declarations: [AppComponent, NavMenuComponent, CounterComponent],
@@ -34,6 +35,7 @@ import { ReviewPageModule } from './review-page/review-page.module';
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HomeModule,
     ReviewPageModule,
+    ReviewSearchModule,
     HttpClientModule,
     FormsModule,
     AuthorizationModule,

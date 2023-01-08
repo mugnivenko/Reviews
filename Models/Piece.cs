@@ -1,5 +1,5 @@
+using NpgsqlTypes;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Reviews.Models;
 
@@ -10,4 +10,6 @@ public class Piece : BaseModel
 
     public virtual ICollection<Review> Reviews { get; set; } = default!;
     public virtual ICollection<Raiting> Raitings { get; set; } = default!;
+
+    public NpgsqlTsVector SearchVector { get; set; } = default!;
 }

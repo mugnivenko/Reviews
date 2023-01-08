@@ -17,5 +17,13 @@ public class PieceEntityTypeConfiguration : IEntityTypeConfiguration<Piece>
         builder
             .HasMany(navigationExpression => navigationExpression.Raitings)
             .WithOne(navigationExpression => navigationExpression.Piece);
+
+        builder
+            .HasGeneratedTsVectorColumn(
+                p => p.SearchVector,
+                "simple",
+                p => new { p.Name })
+            .HasIndex(p => p.SearchVector)
+            .HasMethod("GIN");
     }
 }

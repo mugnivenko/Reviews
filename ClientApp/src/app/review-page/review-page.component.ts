@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { FormControl, Validators } from '@angular/forms';
@@ -20,7 +20,7 @@ import type { Commentary } from 'src/app/shared/models/comment.model';
   templateUrl: './review-page.component.html',
   styleUrls: ['./review-page.component.scss'],
 })
-export class ReviewPageComponent implements OnInit {
+export class ReviewPageComponent implements OnInit, OnDestroy {
   connection!: HubConnection;
   reviewId: Nullable<string> = null;
   userId: Nullable<string> = null;
@@ -111,5 +111,9 @@ export class ReviewPageComponent implements OnInit {
       .subscribe((isAuthorized) => {
         this.isAuthorized = isAuthorized;
       });
+  }
+
+  ngOnDestroy() {
+    this.connection.stop();
   }
 }

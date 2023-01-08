@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 using Reviews.Models;
 using Reviews.Services;
@@ -11,12 +12,8 @@ namespace Reviews.Controllers;
 [Route("api/[controller]")]
 public class AccountsController : ControllerBase
 {
-
     private readonly AccountService _service;
-
     private readonly IMapper _mapper;
-
-
     public AccountsController(AccountService service, IMapper mapper)
     {
         _service = service;

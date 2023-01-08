@@ -4,6 +4,9 @@
   </button>
   <a class="navbar-brand" [routerLink]="['/']">Reviews</a>
   <span class="spacer"></span>
+  <button mat-icon-button (click)="reviewSearch()">
+    <mat-icon>search</mat-icon>
+  </button>
   <button mat-icon-button (click)="toggleTheme()" aria-label="toggle theme">
     <mat-icon *ngIf="theme === Theme.Light">light_mode</mat-icon>
     <mat-icon *ngIf="theme === Theme.Dark">dark_mode</mat-icon>
