@@ -24,9 +24,9 @@ public class ReviewsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetReviews([FromQuery] Guid? userId)
+    public async Task<IActionResult> GetReviews([FromQuery] SearchReviewsDto searchReviews)
     {
-        List<Review> reviews = await _service.GetReviews(userId);
+        List<Review> reviews = await _service.GetReviews(searchReviews);
         return Ok(_mapper.Map<List<FullReviewDto>>(reviews));
     }
 

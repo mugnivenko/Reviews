@@ -30,19 +30,34 @@ public class ReviewService
         _mapper = mapper;
     }
 
-    public async Task<List<Review>> GetReviews(Guid? userId)
+    public async Task<List<Review>> GetReviews(SearchReviewsDto searchReviews)
     {
         IQueryable<Review> query = _context.Reviews;
+        await UncludeRelativeData(query);
         await query.Include(review => review.Creator).LoadAsync();
-        await query.Include(review => review.Group).LoadAsync();
-        await query.Include(review => review.Images).LoadAsync();
-        await query.Include(review => review.Tags).LoadAsync();
-        await query.Include(review => review.Piece).LoadAsync();
-        if (userId != Guid.Empty)
-        {
-            await query.Include(review => review.Likes.Where(like => like.UserId.Equals(userId))).LoadAsync();
-        }
+        await GetUserLike(query, searchReviews.UserId);
+        FilterByTagId(ref query, searchReviews.TagId);
         return await query.ToListAsync();
+    }
+
+    private async Task GetUserLike(IQueryable<Review> query, Guid? userId)
+    {
+        if (userId is not null)
+        {
+            await query
+            .Include(review => review.Likes.Where(like => like.UserId.Equals(userId)))
+            .LoadAsync();
+        }
+    }
+
+    private void FilterByTagId(ref IQueryable<Review> query, Guid? tagId)
+    {
+        if (tagId is not null)
+        {
+            query = query.Where(
+                review => review.Tags.Any(tag => tag.Id == tagId)
+            );
+        }
     }
 
     public async Task<List<Review>> GetUserReviews(Guid userId, SortFilterReviewDto sortFilterReview)

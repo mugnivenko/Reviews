@@ -1,13 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 
-import { switchMap } from 'rxjs';
+import { FormControl } from '@angular/forms';
+import { HttpParams } from '@angular/common/http';
+
+import { Subject, debounceTime, switchMap } from 'rxjs';
 
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
+import { TagService } from 'src/app/shared/services/tag.service';
 import { LikeService } from 'src/app/shared/services/like.service';
 import { ReviewService } from 'src/app/shared/services/review.service';
 import { AuthorizeService } from 'src/app/authorization/authorize.service';
 
+import { QueryState } from 'src/app/shared/enums/query-state.enum';
+
+import type { Tag } from 'src/app/shared/models/tag.model';
 import type { Uuid } from 'src/app/shared/models/uuid.model';
 import type { Review } from 'src/app/shared/models/review.model';
 
@@ -19,37 +26,56 @@ import type { Review } from 'src/app/shared/models/review.model';
 })
 export class HomeComponent implements OnInit {
   reviews: Review[] = [];
+  reviewsState = QueryState.Idle;
+
   isAuthorized = false;
   userId: Nullable<string> = null;
+
+  tagsInput = new FormControl('');
+
+  tags: (Tag & { selected?: boolean })[] = [];
+  selecteTags = new Subject<string>();
+  tagsState = QueryState.Idle;
 
   constructor(
     private reviewService: ReviewService,
     private authorizeService: AuthorizeService,
-    private likeService: LikeService
+    private likeService: LikeService,
+    private tagService: TagService
   ) {}
 
   ngOnInit() {
-    this.getReviewsWithLikes();
-    this.authorizeService
-      .isAuthorized()
-      .pipe(untilDestroyed(this))
-      .subscribe((isAuthorized) => {
-        this.isAuthorized = isAuthorized;
-      });
+    this.getReviewsWithLikes('');
+    this.getIsAuthorized();
+    this.getTags('');
+    this.tagInputSearch();
+    this.selectedTagsChange();
   }
 
-  getReviewsWithLikes() {
+  get QueryState() {
+    return QueryState;
+  }
+
+  getReviewParams({ userId, tagId }: { userId: Uuid; tagId: Uuid }) {
+    return new HttpParams({ fromObject: { userId, tagId } });
+  }
+
+  getReviewsWithLikes(tagId: Uuid) {
+    this.reviewsState = QueryState.Loading;
     this.authorizeService
       .getUserId()
       .pipe(
         switchMap((id) => {
           this.userId = String(id);
-          return this.reviewService.getReviews(id);
+          return this.reviewService.getReviews(
+            this.getReviewParams({ userId: id ?? '', tagId })
+          );
         })
       )
       .pipe(untilDestroyed(this))
       .subscribe((reviews) => {
         this.reviews = reviews;
+        this.reviewsState = QueryState.Success;
       });
   }
 
@@ -88,5 +114,64 @@ export class HomeComponent implements OnInit {
     this.reviews = this.reviews.map((review) =>
       review.id === reviewId ? { ...review, like } : review
     );
+  }
+
+  getIsAuthorized() {
+    this.authorizeService
+      .isAuthorized()
+      .pipe(untilDestroyed(this))
+      .subscribe((isAuthorized) => {
+        this.isAuthorized = isAuthorized;
+      });
+  }
+
+  tagsHttpParams(search: string) {
+    return new HttpParams({ fromObject: { search } });
+  }
+
+  getTags(search: string) {
+    this.tagsState = QueryState.Loading;
+    this.tagService
+      .getTags(this.tagsHttpParams(search))
+      .pipe(untilDestroyed(this))
+      .subscribe((tags) => {
+        this.tags = tags;
+        this.tagsState = QueryState.Success;
+      });
+  }
+
+  tagInputSearch() {
+    this.tagsInput.valueChanges
+      .pipe(debounceTime(500), untilDestroyed(this))
+      .subscribe((search) => {
+        this.getTags(String(search));
+      });
+  }
+
+  onTagClick(id: Uuid) {
+    console.log({ id });
+    this.tags = this.updateTags(this.tags, id);
+  }
+
+  updateTags(tags: (Tag & { selected?: boolean })[], clikedTagId: Uuid) {
+    if (tags.some((tag) => tag.selected && tag.id === clikedTagId)) {
+      this.selecteTags.next('');
+      return tags.map((tag) => ({
+        ...tag,
+        selected: false,
+      }));
+    }
+    this.selecteTags.next(clikedTagId);
+    return tags.map((tag) => ({
+      ...tag,
+      selected: tag.id === clikedTagId,
+    }));
+  }
+
+  selectedTagsChange() {
+    this.selecteTags.subscribe((tag) => {
+      console.log({ tag });
+      this.getReviewsWithLikes(tag);
+    });
   }
 }
