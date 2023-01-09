@@ -2,7 +2,7 @@
   <div class="flex flex-col w-4/5 mt-4">
     <div class="flex justify-end w-4/5 ">
       <mat-form-field appearance="fill">
-        <mat-label>Sort by</mat-label>
+        <mat-label i18n>Sort by</mat-label>
         <mat-select [formControl]="sortControl">
           <mat-option *ngFor="let sort of sortType" [value]="sort">
             {{ sort }}
@@ -27,11 +27,11 @@
               <span>{{ review.piece.name }}</span>
             </div>
             <div class="flex flex-col">
-              <p class="text-sm text-gray-500">Name</p>
+              <p class="text-sm text-gray-500" i18n>Name</p>
               <p class="text-lg">{{ review.name }}</p>
             </div>
             <div class="flex flex-col">
-              <p class="text-sm text-gray-500">Description</p>
+              <p class="text-sm text-gray-500" i18n>Description</p>
               <markdown ngPreserveWhitespaces
                         [data]="review.content.split('\n').slice(0, 2).join('\n') + '...'">
               </markdown>
@@ -43,7 +43,7 @@
                     (click)=onLikeClick(review.id)>
               <mat-icon>favorite</mat-icon>
             </button>
-            <button mat-button [routerLink]="['/review', review.id]">Read More</button>
+            <button mat-button [routerLink]="['/review', review.id]" i18n>Read More</button>
           </mat-card-actions>
         </mat-card>
       </ng-container>

@@ -12,7 +12,7 @@
         <mat-label i18n>Leave a comment</mat-label>
         <textarea matInput [formControl]="commentaryControl"></textarea>
       </mat-form-field>
-      <button class="h-fit"
+      <button class="h-fit comment-button"
               mat-raised-button
               [disabled]="commentaryControl.invalid || commentarySavingState === QueryState.Loading"
               (click)="onSaveCommentClick()"
@@ -21,7 +21,7 @@
                      class="save-comment-loading"
                      [diameter]="20">
         </mat-spinner>
-        <p>Comment</p>
+        <p class="margin-0" i18n >Comment</p>
       </button>
     </div>
   </div>

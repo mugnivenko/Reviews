@@ -1,4 +1,5 @@
-<h1 mat-dialog-title i18n>{{ isEdit ? "Edit Review" : "New review" }}</h1>
+<h1 mat-dialog-title *ngIf="isEdit" i18n>Edit Review</h1>
+<h1 mat-dialog-title *ngIf="!isEdit" i18n>New review</h1>
 <mat-dialog-content>
     <form [formGroup]="reviewForm" class="w-100">
       <mat-form-field class="w-full" appearance="fill">
@@ -146,8 +147,11 @@
                  class="save-button-loading"
                  [diameter]="20">
     </mat-spinner>
-    <p i18n class="save-button-text">
-      {{ isEdit ?  "Save" : "Create"  }}
+    <p *ngIf="isEdit" i18n class="save-button-text">
+      Save
+    </p>
+    <p *ngIf="!isEdit" i18n class="save-button-text">
+      Create
     </p>
   </button>
 </div>
