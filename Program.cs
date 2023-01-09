@@ -84,6 +84,7 @@ builder.Services.AddScoped<StorageService>();
 builder.Services.AddScoped<LikesService>();
 builder.Services.AddScoped<CommentaryService>();
 builder.Services.AddScoped<SearchService>();
+builder.Services.AddScoped<RatingService>();
 
 builder.Services.AddAutoMapper(typeof(Program));
 

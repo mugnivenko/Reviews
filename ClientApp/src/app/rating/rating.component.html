@@ -1,0 +1,15 @@
+<div class="flex gap-2"> 
+  <mat-spinner *ngIf="loading" [diameter]="20">
+  </mat-spinner>
+  <div class="flex gap-1">
+    <button *ngFor="let ratingStar of ratingsStars"
+          mat-icon-button
+          type="primary"
+          [disabled]="loading"
+          (click)="onClick(ratingStar.rating)">
+    <mat-icon>
+      {{ ratingStar.fill ? 'star' : 'star_border '}}
+    </mat-icon>
+  </button>
+  </div>
+</div>

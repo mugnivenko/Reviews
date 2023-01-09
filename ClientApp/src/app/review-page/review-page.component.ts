@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { HttpParams } from '@angular/common/http';
 
 import { FormControl, Validators } from '@angular/forms';
 
@@ -8,11 +9,13 @@ import type { HubConnection } from '@microsoft/signalr';
 
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
-import { CommentaryService } from 'src/app/shared/services/commentary.service';
+import { RatingService } from 'src/app/shared/services/rating.service';
 import { AuthorizeService } from 'src/app/authorization/authorize.service';
+import { CommentaryService } from 'src/app/shared/services/commentary.service';
 
 import { QueryState } from 'src/app/shared/enums/query-state.enum';
 import type { Commentary } from 'src/app/shared/models/comment.model';
+import type { Rating } from 'src/app/shared/models/rating.model';
 
 @UntilDestroy()
 @Component({
@@ -33,10 +36,14 @@ export class ReviewPageComponent implements OnInit, OnDestroy {
 
   commentaries: Commentary[] = [];
 
+  savedRating: Nullable<Rating> = null;
+  ratingSavingState = QueryState.Idle;
+
   constructor(
     private route: ActivatedRoute,
     private commentaryService: CommentaryService,
-    private authorizeService: AuthorizeService
+    private authorizeService: AuthorizeService,
+    private ratingService: RatingService
   ) {}
 
   ngOnInit(): void {
@@ -44,10 +51,62 @@ export class ReviewPageComponent implements OnInit, OnDestroy {
     this.reviewId = this.route.snapshot.paramMap.get('id');
     this.getCommentaries();
     this.getAuthorizeInfo();
+    if (this.isAuthorized) {
+      this.getRating();
+    }
   }
 
   get QueryState() {
     return QueryState;
+  }
+
+  getRating() {
+    if (this.userId === null) return;
+    this.ratingSavingState = QueryState.Loading;
+    this.ratingService
+      .getRating(
+        new HttpParams({
+          fromObject: {
+            userId: String(this.userId),
+            reviewId: String(this.reviewId),
+          },
+        })
+      )
+      .pipe(untilDestroyed(this))
+      .subscribe((rating) => {
+        this.savedRating = rating;
+        this.ratingSavingState = QueryState.Success;
+      });
+  }
+
+  ratingChange(rating: number) {
+    this.ratingSavingState = QueryState.Loading;
+    if (this.savedRating === null) {
+      this.saveRating(rating);
+      return;
+    }
+    this.editRating(rating);
+  }
+
+  saveRating(rating: number) {
+    this.ratingService
+      .saveRating({ reviewId: String(this.reviewId), value: rating })
+      .pipe(untilDestroyed(this))
+      .subscribe((rating) => {
+        this.savedRating = rating;
+        this.ratingSavingState = QueryState.Success;
+      });
+  }
+
+  editRating(rating: number) {
+    if (this.savedRating === null) return;
+    this.ratingService
+      .editRating(this.savedRating.id, { value: rating })
+      .pipe(untilDestroyed(this))
+      .subscribe((rating) => {
+        this.savedRating = rating;
+        this.ratingSavingState = QueryState.Success;
+      });
   }
 
   initCommentariesConnection() {

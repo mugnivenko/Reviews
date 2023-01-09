@@ -1,3 +1,32 @@
+
+<div class="flex justify-center mt-2">
+  <div class="w-3/5 flex flex-col justify-end gap-2">
+    <app-rating *ngIf="isAuthorized"
+                class="w-fit self-end"
+                [rating]="savedRating !== null ? savedRating.value : 0"
+                (ratingChange)="ratingChange($event)"
+                [loading]="ratingSavingState === QueryState.Loading">
+    </app-rating>
+    <div *ngIf="isAuthorized" class="flex items-center justify-center gap-2 mt-4">
+      <mat-form-field class="w-full">
+        <mat-label i18n>Leave a comment</mat-label>
+        <textarea matInput [formControl]="commentaryControl"></textarea>
+      </mat-form-field>
+      <button class="h-fit"
+              mat-raised-button
+              [disabled]="commentaryControl.invalid || commentarySavingState === QueryState.Loading"
+              (click)="onSaveCommentClick()"
+              color="primary">
+        <mat-spinner *ngIf="commentarySavingState === QueryState.Loading"
+                     class="save-comment-loading"
+                     [diameter]="20">
+        </mat-spinner>
+        <p>Comment</p>
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="flex justify-center" >
   <mat-spinner *ngIf="commentariesState === QueryState.Loading">
   </mat-spinner>
@@ -14,22 +43,4 @@
       <pre class="text-base">{{ commentary.content }}</pre>
     </div>
   </div>
-</div>
-
-<div *ngIf="isAuthorized" class="flex items-center justify-center gap-2 mt-4">
-  <mat-form-field class="w-3/5">
-    <mat-label i18n>Leave a comment</mat-label>
-    <textarea matInput [formControl]="commentaryControl"></textarea>
-  </mat-form-field>
-  <button class="h-fit"
-          mat-raised-button
-          [disabled]="commentaryControl.invalid || commentarySavingState === QueryState.Loading"
-          (click)="onSaveCommentClick()"
-          color="primary">
-    <mat-spinner *ngIf="commentarySavingState === QueryState.Loading"
-                 class="save-comment-loading"
-                 [diameter]="20">
-    </mat-spinner>
-    <p>Comment</p>
-  </button>
 </div>
