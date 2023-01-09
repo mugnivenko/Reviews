@@ -30,6 +30,13 @@ public class ReviewsController : ControllerBase
         return Ok(_mapper.Map<List<FullReviewDto>>(reviews));
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetReviews(Guid id)
+    {
+        Review reviews = await _service.GetReviewWithCreator(id);
+        return Ok(_mapper.Map<FullReviewDto>(reviews));
+    }
+
     [Authorize]
     [HttpGet("users/{id}")]
     public async Task<IActionResult> GetUserReviews(Guid id, [FromQuery] SortFilterReviewDto sortFilterReview)

@@ -1,3 +1,41 @@
+<div>
+  <div>
+    <p class="text-lg text-gray-500">Piece</p>
+    <p>{{ review?.piece?.name }}</p>
+  </div>
+  <div>
+    <p class="text-lg text-gray-500">Name</p>
+    <p>{{ review?.name }}</p>
+  </div>
+  <div>
+    <p class="text-lg text-gray-500">Description</p>
+    <markdown ngPreserveWhitespaces [data]="review?.content"></markdown>
+  </div>
+  <div class="mt-2">
+    <p class="text-lg text-gray-500">Tags</p>
+    <mat-chip-list class="mt-2">
+      <mat-chip *ngFor="let tag of review?.tags">{{ tag.name }}</mat-chip>
+    </mat-chip-list>
+  </div>
+  <div class="mt-2">
+    <p class="text-lg text-gray-500">Creator</p>
+    <p>{{ review?.creator?.userName }}</p>
+  </div>
+  <div class="mt-2">
+    <p class="text-lg text-gray-500">Created Date</p>
+    <p>{{ review?.createdAt | date: 'MMM d, y, h:mm a' }}</p>
+  </div>
+  <div>
+    <img *ngFor="let image of review?.images"
+         class="w-4/12"
+         [src]="image.link"
+         alt="review image"/>
+  </div>
+</div>
+
+<mat-spinner *ngIf="reviewState === QueryState.Loading">
+</mat-spinner>
+
 
 <div class="flex justify-center mt-2">
   <div class="w-3/5 flex flex-col justify-end gap-2">

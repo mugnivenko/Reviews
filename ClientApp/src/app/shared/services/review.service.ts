@@ -19,6 +19,10 @@ export class ReviewService {
     return this.httpClient.get<Review[]>(`reviews/users/${id}`, { params });
   }
 
+  getReview(id: Uuid) {
+    return this.httpClient.get<Review>(`reviews/${id}`);
+  }
+
   public create(review: SavingReview) {
     return this.httpClient.post<Review[]>(`reviews`, review);
   }

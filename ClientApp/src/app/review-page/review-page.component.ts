@@ -10,12 +10,14 @@ import type { HubConnection } from '@microsoft/signalr';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
 import { RatingService } from 'src/app/shared/services/rating.service';
+import { ReviewService } from 'src/app/shared/services/review.service';
 import { AuthorizeService } from 'src/app/authorization/authorize.service';
 import { CommentaryService } from 'src/app/shared/services/commentary.service';
 
 import { QueryState } from 'src/app/shared/enums/query-state.enum';
-import type { Commentary } from 'src/app/shared/models/comment.model';
 import type { Rating } from 'src/app/shared/models/rating.model';
+import type { Review } from 'src/app/shared/models/review.model';
+import type { Commentary } from 'src/app/shared/models/comment.model';
 
 @UntilDestroy()
 @Component({
@@ -28,6 +30,9 @@ export class ReviewPageComponent implements OnInit, OnDestroy {
   reviewId: Nullable<string> = null;
   userId: Nullable<string> = null;
   isAuthorized = false;
+
+  review: Nullable<Review> = null;
+  reviewState = QueryState.Idle;
 
   commentariesState = QueryState.Idle;
 
@@ -43,7 +48,8 @@ export class ReviewPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private commentaryService: CommentaryService,
     private authorizeService: AuthorizeService,
-    private ratingService: RatingService
+    private ratingService: RatingService,
+    private reviewService: ReviewService
   ) {}
 
   ngOnInit(): void {
@@ -51,6 +57,7 @@ export class ReviewPageComponent implements OnInit, OnDestroy {
     this.reviewId = this.route.snapshot.paramMap.get('id');
     this.getCommentaries();
     this.getAuthorizeInfo();
+    this.getReview();
     if (this.isAuthorized) {
       this.getRating();
     }
@@ -58,6 +65,17 @@ export class ReviewPageComponent implements OnInit, OnDestroy {
 
   get QueryState() {
     return QueryState;
+  }
+
+  getReview() {
+    this.reviewState = QueryState.Loading;
+    this.reviewService
+      .getReview(String(this.reviewId))
+      .pipe(untilDestroyed(this))
+      .subscribe((review) => {
+        this.review = review;
+        this.reviewState = QueryState.Success;
+      });
   }
 
   getRating() {

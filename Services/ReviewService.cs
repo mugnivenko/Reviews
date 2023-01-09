@@ -41,6 +41,14 @@ public class ReviewService
         return await query.Take(10).ToListAsync();
     }
 
+    public async Task<Review> GetReviewWithCreator(Guid id)
+    {
+        IQueryable<Review> query = _context.Reviews.Where(review => review.Id == id);
+        await UncludeRelativeData(query);
+        await query.Include(review => review.Creator).LoadAsync();
+        return await query.SingleAsync();
+    }
+
     private async Task GetUserLike(IQueryable<Review> query, Guid? userId)
     {
         if (userId is not null)
