@@ -37,7 +37,8 @@ public class ReviewService
         await query.Include(review => review.Creator).LoadAsync();
         await GetUserLike(query, searchReviews.UserId);
         FilterByTagId(ref query, searchReviews.TagId);
-        return await query.ToListAsync();
+        SortReviews(ref query, searchReviews.Sort);
+        return await query.Take(10).ToListAsync();
     }
 
     private async Task GetUserLike(IQueryable<Review> query, Guid? userId)
@@ -58,6 +59,16 @@ public class ReviewService
                 review => review.Tags.Any(tag => tag.Id == tagId)
             );
         }
+    }
+
+    private void SortReviews(ref IQueryable<Review> query, string sort)
+    {
+        query = sort switch
+        {
+            "Latest" => query.OrderByDescending(review => review.CreatedAt),
+            "Grade" => query.OrderByDescending(review => review.Grade),
+            _ => query
+        };
     }
 
     public async Task<List<Review>> GetUserReviews(Guid userId, SortFilterReviewDto sortFilterReview)

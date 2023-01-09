@@ -3,7 +3,13 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { HttpParams } from '@angular/common/http';
 
-import { Subject, debounceTime, switchMap } from 'rxjs';
+import {
+  Subject,
+  switchMap,
+  startWith,
+  debounceTime,
+  combineLatest,
+} from 'rxjs';
 
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
@@ -17,6 +23,8 @@ import { QueryState } from 'src/app/shared/enums/query-state.enum';
 import type { Tag } from 'src/app/shared/models/tag.model';
 import type { Uuid } from 'src/app/shared/models/uuid.model';
 import type { Review } from 'src/app/shared/models/review.model';
+
+import { ReviewSort } from './shared/review-sort.enum';
 
 @UntilDestroy()
 @Component({
@@ -37,6 +45,9 @@ export class HomeComponent implements OnInit {
   selecteTags = new Subject<string>();
   tagsState = QueryState.Idle;
 
+  sortControl = new FormControl(ReviewSort.Latest);
+  sortType = Object.values(ReviewSort);
+
   constructor(
     private reviewService: ReviewService,
     private authorizeService: AuthorizeService,
@@ -45,19 +56,18 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.getReviewsWithLikes('');
     this.getIsAuthorized();
     this.getTags('');
     this.tagInputSearch();
-    this.selectedTagsChange();
+    this.selectedTagsOrSortChange();
   }
 
   get QueryState() {
     return QueryState;
   }
 
-  getReviewParams({ userId, tagId }: { userId: Uuid; tagId: Uuid }) {
-    return new HttpParams({ fromObject: { userId, tagId } });
+  getReviewParams(params: { userId: Uuid; tagId: Uuid; sort: ReviewSort }) {
+    return new HttpParams({ fromObject: params });
   }
 
   getReviewsWithLikes(tagId: Uuid) {
@@ -68,7 +78,11 @@ export class HomeComponent implements OnInit {
         switchMap((id) => {
           this.userId = String(id);
           return this.reviewService.getReviews(
-            this.getReviewParams({ userId: id ?? '', tagId })
+            this.getReviewParams({
+              userId: id ?? '',
+              tagId,
+              sort: String(this.sortControl.value) as ReviewSort,
+            })
           );
         })
       )
@@ -168,10 +182,15 @@ export class HomeComponent implements OnInit {
     }));
   }
 
-  selectedTagsChange() {
-    this.selecteTags.subscribe((tag) => {
-      console.log({ tag });
-      this.getReviewsWithLikes(tag);
-    });
+  selectedTagsOrSortChange() {
+    const tag$ = this.selecteTags.pipe(startWith(''));
+    const sort$ = this.sortControl.valueChanges.pipe(
+      startWith(ReviewSort.Latest)
+    );
+    combineLatest([tag$, sort$])
+      .pipe(untilDestroyed(this))
+      .subscribe(([tag]) => {
+        this.getReviewsWithLikes(tag);
+      });
   }
 }

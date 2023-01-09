@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { HomeComponent } from './home.component';
@@ -22,6 +23,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     MatChipsModule,
     MatInputModule,
     MatButtonModule,
+    MatSelectModule,
     MatProgressSpinnerModule,
     MarkdownModule.forChild(),
     RouterModule,
