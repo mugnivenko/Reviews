@@ -46,7 +46,7 @@ export class HomeComponent implements OnInit {
   tagsState = QueryState.Idle;
 
   sortControl = new FormControl(ReviewSort.Latest);
-  sortType = Object.values(ReviewSort);
+  sortType = Object.entries(ReviewSort).map(([key, value]) => ({ key, value }));
 
   constructor(
     private reviewService: ReviewService,
@@ -66,7 +66,7 @@ export class HomeComponent implements OnInit {
     return QueryState;
   }
 
-  getReviewParams(params: { userId: Uuid; tagId: Uuid; sort: ReviewSort }) {
+  getReviewParams(params: { userId: Uuid; tagId: Uuid; sort: string }) {
     return new HttpParams({ fromObject: params });
   }
 
@@ -81,7 +81,7 @@ export class HomeComponent implements OnInit {
             this.getReviewParams({
               userId: id ?? '',
               tagId,
-              sort: String(this.sortControl.value) as ReviewSort,
+              sort: String(this.sortControl.value),
             })
           );
         })

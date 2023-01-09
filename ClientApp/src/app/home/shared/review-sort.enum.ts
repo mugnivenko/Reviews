@@ -1,4 +1,4 @@
-export enum ReviewSort {
-  Latest = 'Latest',
-  Grade = 'Grade',
-}
+export const ReviewSort = {
+  Latest: $localize`Latest`,
+  Grade: $localize`Grade`,
+};

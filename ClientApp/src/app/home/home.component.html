@@ -4,8 +4,8 @@
       <mat-form-field appearance="fill">
         <mat-label i18n>Sort by</mat-label>
         <mat-select [formControl]="sortControl">
-          <mat-option *ngFor="let sort of sortType" [value]="sort">
-            {{ sort }}
+          <mat-option *ngFor="let sort of sortType" [value]="sort.key">
+            {{ sort.value }}
           </mat-option>
         </mat-select>
       </mat-form-field>
